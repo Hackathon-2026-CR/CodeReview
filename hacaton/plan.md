@@ -10,17 +10,22 @@ code languages: list, default: None
 
 
 
-codes:
+tasks:
 
-id
 title
 user name
 code languages: list
-text to describe the code: long text
-groups of code [who can review the code]
+description
+groups[who can review the code]
 status: [waiting for review, review in process, reviwed] default: waiting for review
 reviewer: default: None
 price: int [how much he willing to pay for a review]
+
+
+
+title, user_name ,languages, description, groups, status, price
+
+
 
 
 reviews: [only available to the client and the reviewer]
