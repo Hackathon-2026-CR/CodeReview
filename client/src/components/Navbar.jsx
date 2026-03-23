@@ -5,6 +5,8 @@ const pages = [
   { name: "Home", path: "/" },
   { name: "All Tasks", path: "/all-tasks" },
   { name: "My Tasks", path: "/my-tasks" },
+  { name: "Add Task", path: "/add-task" },
+  { name: "Task Details", path: "/task-details/:id" },
 ];
 
 export default function Navbar() {
