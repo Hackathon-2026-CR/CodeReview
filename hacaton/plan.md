@@ -6,7 +6,7 @@ credits default: 200
 groups: list [names of company he works for] default: None
 price: int [how much he ask per review]  default: None
 rating [from 0.1 to 5.0] default: None
-code languages: list, default: None
+languages: list, default: empty list
 
 
 
@@ -14,9 +14,9 @@ tasks:
 
 title
 user name
-code languages: list
+languages: list
 description
-groups[who can review the code]
+groups[who can review the code] default: public
 status: [waiting for review, review in process, reviwed] default: waiting for review
 reviewer: default: None
 price: int [how much he willing to pay for a review]
