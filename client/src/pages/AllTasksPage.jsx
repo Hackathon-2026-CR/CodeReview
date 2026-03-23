@@ -9,7 +9,8 @@ function AllTasksPage() {
      React.useEffect(() => {
         const fetchTasks = async () => {
             try {
-                const response = await fetch('/api/all-tasks') ////
+                // endpoint 5 : "/api/tasks/all-tasks", GET, response: list of all tasks available in the system
+                const response = await fetch('/api/tasks/all-tasks') ////
                 const data = await response.json()
                 setTasks(data)
             } catch (error) {
