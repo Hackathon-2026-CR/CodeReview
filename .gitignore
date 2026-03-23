@@ -1,3 +1,4 @@
 .venv
 .idea
-hacaton/querys/__pycache__/
+querys/__pycache__/
+hacaton/utils/__pycache__/__init__.cpython-313.pyc
