@@ -42,7 +42,6 @@ if connection and cursor:
         cursor.execute(create_users_table)
         cursor.execute(create_codes_table)
 
-        # Step 3: Hardcoded Users (20 rows)
         empty_list = json.dumps([])
         users_data = [
             ('Jacob', 'pass_jacob', 500, json.dumps(['Google', 'Meta']), 50, 4.8, json.dumps(['Python', 'SQL']), empty_list),
@@ -67,9 +66,7 @@ if connection and cursor:
             ('Trent', 'pass_trent', 340, json.dumps(['GitHub', 'GitLab']), 50, 4.4, json.dumps(['Ruby', 'Go']), empty_list)
         ]
 
-        # Step 4: Hardcoded Codes (20 rows) - Jacob owns the first 10
         codes_data = [
-            # 1-10: Jacob's Codes
             ('Python Aggregator', 'Jacob', json.dumps(['Python', 'SQL']), 'A script to scrape and aggregate data from a REST API.', json.dumps(['Meta', 'Google']), 'waiting for review', None, 45),
             ('Elasticsearch Pipeline', 'Jacob', json.dumps(['Python']), 'Log indexing pipeline pushing to Elasticsearch.', json.dumps(['Amazon', 'Google']), 'review in process', 'Alice', 60),
             ('Kafka Producer', 'Jacob', json.dumps(['Python', 'Java']), 'Distributed message producer for microservices.', json.dumps(['Netflix']), 'reviewed', 'Bob', 50),
@@ -80,8 +77,6 @@ if connection and cursor:
             ('OpenShift Deploy', 'Jacob', json.dumps(['YAML', 'Shell']), 'Deployment configurations for Kubernetes/OpenShift.', json.dumps(['IBM', 'Oracle']), 'review in process', 'Ivan', 70),
             ('Data Cleansing Script', 'Jacob', json.dumps(['Python', 'Pandas']), 'Pandas script to clean corrupted CSV files.', json.dumps(['Apple']), 'reviewed', 'Charlie', 30),
             ('SQL Window Functions', 'Jacob', json.dumps(['SQL']), 'Advanced analytical queries using PARTITION BY.', json.dumps(['Palantir']), 'waiting for review', None, 80),
-            
-            # 11-20: Other Users' Codes
             ('Java Auth Microservice', 'Alice', json.dumps(['Java']), 'Spring Boot microservice for user authentication.', json.dumps(['Amazon']), 'review in process', 'Frank', 30),
             ('React Dropdown', 'Bob', json.dumps(['JavaScript']), 'React component for a dynamic dropdown menu.', json.dumps(['Microsoft']), 'reviewed', 'Grace', 40),
             ('iOS Map View', 'Charlie', json.dumps(['Swift']), 'iOS app logic for rendering a custom map view.', json.dumps(['Apple']), 'waiting for review', None, 50),
@@ -94,7 +89,6 @@ if connection and cursor:
             ('Express Server Setup', 'Judy', json.dumps(['JavaScript']), 'Basic Node.js Express API server setup.', json.dumps(['Lyft']), 'reviewed', 'Laura', 10)
         ]
 
-        # Step 5: Execute inserts
         insert_users_query = """
         INSERT INTO users (name, password, credits, `groups`, price, rating, code_languages, list_of_codes)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
