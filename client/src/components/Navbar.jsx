@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { useUser, useClerk } from "@clerk/clerk-react";
 
 const pages = [
   { name: "Home", path: "/" },
@@ -12,11 +13,11 @@ const pages = [
 export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
+  const { user } = useUser();
+  const { signOut } = useClerk();
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
+  const handleLogout = async () => {
+    await signOut();
   };
 
   return (
@@ -44,7 +45,7 @@ export default function Navbar() {
           style={styles.accountBtn}
           onClick={() => setDropdownOpen((prev) => !prev)}
         >
-          My Account
+          {user?.firstName || user?.emailAddresses?.[0]?.emailAddress || "Account"}
         </button>
 
         {dropdownOpen && (
