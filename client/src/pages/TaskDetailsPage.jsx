@@ -9,6 +9,7 @@ function TaskDetailsPage() {
     React.useEffect(() => {
         const fetchTaskDetails = async () => {
             try {
+                // endpoint 6 : "/api/tasks/:id", GET, response: details of a specific task based on its ID
                 const response = await fetch(`/api/tasks/${id}`) ////
                 const data = await response.json()
                 setTask(data)
@@ -27,7 +28,6 @@ function TaskDetailsPage() {
             <div>
                 <h1>{task.title}</h1>
                 <p>{task.description}</p>
-                /////////////////////////////
             </div>
         ) : (
             <p>Task not found</p>

@@ -6,7 +6,8 @@ function AddTaskPage() {
 
     const addTask = async () => {
         try {
-            const response = await fetch('/api/add-task', {
+            // endpoint 4 : "/api/tasks/add-task", POST, body: task details, response: added task
+            const response = await fetch('/api/tasks/add-task', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
