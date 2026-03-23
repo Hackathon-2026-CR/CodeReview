@@ -24,7 +24,7 @@ def published_codes(username): # 2
 
     try:
         query = """
-        SELECT * FROM codes
+        SELECT * FROM tasks
         WHERE user_name = %s
         """
 
@@ -43,39 +43,17 @@ def published_codes(username): # 2
         print(f"Database error: {err}")
 
 
-def working_on(username): # 3
-
-    try:
-        query = """
-        SELECT * FROM codes
-        WHERE reviewer_name = %s
-        """
-
-        cursor.execute(query, [username])
-        print('yo')
-        answer = cursor.fetchall()
-        response = []
-        if answer:
-            for row in answer:
-                response.append(row)
-        else:
-            print(f"No codes found for reviewer: {username}")
-
-    except mysql.connector.Error as err:
-        print(f"Database error: {err}")
-
 
 
 def working_on(username): # 3
 
     try:
         query = """
-        SELECT * FROM codes
+        SELECT * FROM tasks
         WHERE reviewer_name = %s
         """
 
         cursor.execute(query, [username])
-        print('yo')
         answer = cursor.fetchall()
         response = []
         if answer:
@@ -92,7 +70,7 @@ def working_on(username): # 3
 def add_task_to_codes(task): # 4
     try:
         insert_query = """
-        INSERT INTO codes (title, user_name ,code_languages, description, groups_of_code, status, price)
+        INSERT INTO tasks (title, user_name ,languages, description, groups, status, price)
         VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
 
@@ -104,41 +82,56 @@ def add_task_to_codes(task): # 4
         return f"Database error: {err}"
 
 
+def get_available_by_user(username): # 5
+    try:
+        user = """
+        SELECT groups FROM users
+        WHERE user = %s
+        """
+        cursor.execute(user, username)
+        groups = cursor.fetchone()
 
-# def get_all_tasks(task): # 4
-#     try:
-#         insert_query = """
-#         INSERT INTO codes (title, user_name ,code_languages, description, groups_of_code, status, price)
-#         VALUES (%s, %s, %s, %s, %s, %s, %s)
-#         """
+        query = """
+        SELECT t.* 
+        FROM tasks t
+        JOIN users u ON u.name = %s
+        WHERE JSON_OVERLAPS(t.groups, u.`groups`) 
+           OR JSON_CONTAINS(t.groups, '"public"');
+        """
+        cursor.execute(query, groups)
+        answer = cursor.fetchall()
+        response = []
+        if answer:
+            for row in answer:
+                response.append(row)
+            return response
+        
+        else:
+            print(f"No codes found for reviewer: {username}")
 
-#         cursor.execute(insert_query, **task)
-#         connection.commit()
-#         return {"response": f"task {task['title']} added"}
-
-#     except mysql.connector.Error as err:
-#         return f"Database error: {err}"
+    except mysql.connector.Error as err:
+        return f"Database error: {err}"
 
 
 
+def get_task_by_id(id): # 6
+    try:
+        query = """
+        SELECT * FROM users
+        WHERE id = %s
+        """
+
+        cursor.execute(query, [id])
+        answer = cursor.fetchone()
+        return answer
+
+    except mysql.connector.Error as err:
+        print(f"Database error: {err}")
 
 
-# get_user('jacob')
+
 
 
 # python -m querys.dal 
 
 
-
-
-
-# hard coded until i get the actual data
-        # # new_code_data = code
-        # new_code_data = (
-        #     'Jacob',                                                          # user_name
-        #     json.dumps(['Python', 'Elasticsearch']),                          # code_languages
-        #     'Data aggregation pipeline script, please go easy on me',         # description
-        #     json.dumps(['Google', 'Amazon']),                                 # groups_of_code
-        #     'waiting for review',                                             # status
-        #     60                                                                # price
-        # )
