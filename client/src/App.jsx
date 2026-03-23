@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from '@clerk/clerk-react'
 import Navbar from './components/Navbar'
@@ -66,7 +65,10 @@ function App() {
           }
         />
 
-        <Route path="*" element={<Navigate to={isSignedIn ? '/' : '/sign-in'} replace />} />
+        <Route
+          path="*"
+          element={<Navigate to={isSignedIn ? '/' : '/sign-in'} replace />}
+        />
       </Routes>
     </Router>
   )

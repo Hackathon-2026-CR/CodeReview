@@ -10,7 +10,14 @@ function MyTasksPage() {
     useEffect(() => {
         const fetchTasks = async () => {
             try {
-                const response = await fetch('/api/my-tasks') ////
+                // endpoint 2 : "/api/tasks/my-tasks", POST, body: username, response: list of tasks created by the user
+                const response = await fetch('/api/tasks/my-tasks', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username: localStorage.getItem('username') })
+                }) 
                 const data = await response.json()
                 setMyTasks(data)
             } catch (error) {
@@ -25,7 +32,14 @@ function MyTasksPage() {
     useEffect(() => {
         const fetchWorkingTasks = async () => {
             try {
-                const response = await fetch('/api/working-tasks') ////
+                // endpoint 3 : "/api/tasks/working-tasks", POST, body: username, response: list of tasks the user is currently working on
+                const response = await fetch('/api/tasks/working-tasks', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username: localStorage.getItem('username') })
+                }) ////
                 const data = await response.json()
                 setWorkingTasks(data)
             } catch (error) {
