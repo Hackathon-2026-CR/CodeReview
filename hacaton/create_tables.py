@@ -39,7 +39,6 @@ if connection and cursor:
         cursor.execute(create_users_table)
         cursor.execute(create_tasks_table)
 
-        # Step 4: Dummy Data for Users (Matches new schema: name, password, credits, groups, price, rating, languages)
         users_data = [
             ('Jacob', 'pass_jacob', 500, json.dumps(['Google', 'Meta']), 50, 4.8, json.dumps(['Python', 'SQL'])),
             ('Alice', 'pass_alice', 300, json.dumps(['Amazon']), 35, 4.2, json.dumps(['Java', 'C++'])),
@@ -63,7 +62,6 @@ if connection and cursor:
             ('Trent', 'pass_trent', 340, json.dumps(['GitHub', 'GitLab']), 50, 4.4, json.dumps(['Ruby', 'Go']))
         ]
 
-        # Step 5: Dummy Data for Tasks (Matches new schema: title, user_name, languages, description, groups, status, reviewer, price)
         tasks_data = [
             ('Python Aggregator', 'Jacob', json.dumps(['Python', 'SQL']), 'A script to scrape data.', json.dumps(['Meta', 'Google']), 'waiting for review', None, 45),
             ('Elasticsearch Pipeline', 'Jacob', json.dumps(['Python']), 'Log indexing pipeline.', json.dumps(['Amazon', 'Google']), 'review in process', 'Alice', 60),

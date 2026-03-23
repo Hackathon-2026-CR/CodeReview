@@ -5,7 +5,7 @@ import json
 connection, cursor =  get_connection()
 
 
-def get_user(username):
+def get_user(username): # 1
     try:
         query = """
         SELECT * FROM users
@@ -67,19 +67,26 @@ def working_on(username): # 3
 
 
 
-def add_task_to_codes(task): # 4
+
+def add_task_to_codes(task): 
     try:
         insert_query = """
-        INSERT INTO tasks (title, user_name ,languages, description, groups, status, price)
-        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO tasks (title, user_name, languages, description, `groups`, price)
+        VALUES (%(title)s, %(user_name)s, %(languages)s, %(description)s, %(groups)s, %(price)s)
         """
 
-        cursor.execute(insert_query, **task)
+        task['languages'] = json.dumps(task['languages'])
+        task['groups'] = json.dumps(task['groups'])
+
+        cursor.execute(insert_query, task)
         connection.commit()
-        return {"response": f"task {task['title']} added"}
+        
+        return {"response": f"task '{task['title']}' added"}
 
     except mysql.connector.Error as err:
         return f"Database error: {err}"
+
+
 
 
 def get_available_by_user(username): # 5
@@ -112,7 +119,6 @@ def get_available_by_user(username): # 5
     except mysql.connector.Error as err:
         return f"Database error: {err}"
 
-get_available_by_user()
 
 def get_task_by_id(id): # 6
     try:

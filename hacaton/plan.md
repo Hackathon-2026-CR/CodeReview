@@ -42,3 +42,27 @@ rating of the review: [the client rate the reviewer]
 
 
 <!-- list of codes: list [default empty] -->
+
+
+users:
+
+name 
+password
+credits
+groups: 
+price: int 
+rating [from 0.1 to 5.0] 
+languages: list
+
+
+
+tasks:
+
+title
+user name
+languages
+description
+groups[who can review the code] default: public
+status:
+reviewer: default: None
+price: int 
