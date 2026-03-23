@@ -33,7 +33,7 @@ def published_codes(name):
 # hard coded until i get the actual data
 # published_codes('Jacob')
 
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # actions on the db
 
 def assign_reviewer(code_title, reviewer):

@@ -29,9 +29,6 @@ def get_connection():
 
 
 def close_connection(connection, cursor):
-    """
-    Safely closes the database cursor and connection.
-    """
     if cursor is not None:
         try:
             cursor.close()
