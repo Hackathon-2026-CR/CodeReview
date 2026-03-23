@@ -2,7 +2,9 @@ import React from 'react'
 
 function HomePage() {
   return (
-    <div>HomePage</div>
+    <div className='home-page'>
+        <h1>Welcome to CodeReview app !</h1>
+    </div>
   )
 }
 
