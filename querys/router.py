@@ -29,8 +29,8 @@ def add_task(task: TaskCreate):
     pass
 
 
-@router.get('/all-tasks')
-def get_all_tasks():
+@router.get('/all-tasks/{user_name}')
+def get_all_tasks(user_name):
     pass
 
 
