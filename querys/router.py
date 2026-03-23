@@ -31,9 +31,9 @@ def add_task(task: TaskCreate):
 
 @router.get('/all-tasks/{user_name}')
 def get_all_tasks(user_name):
-    pass
+    return dal.get_available_by_user(user_name)
 
 
 @router.get('/{id}')
 def get_task_using_id(id):
-    pass
+    return dal.get_task_by_id(id)
