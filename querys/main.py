@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from router import router
+from querys.router import router
 
 app = FastAPI(title='CodeReview')
 
