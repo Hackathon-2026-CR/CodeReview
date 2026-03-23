@@ -3,15 +3,22 @@ import Navbar from "../components/Navbar";
 import "../styles/AddTaskPage.css";
 
 function AddTaskPage() {
-  const [newTask, setNewTask] = React.useState({ title: "", description: "" });
+  const [newTask, setNewTask] = React.useState({
+    title: "",
+    description: "",
+  });
 
   const addTask = async () => {
     try {
-      const response = await fetch("/api/add-task", {
+      // endpoint 4 : "/api/tasks/add-task"
+      const response = await fetch("/api/tasks/add-task", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(newTask),
       });
+
       const data = await response.json();
       console.log("Task added:", data);
     } catch (error) {
@@ -24,6 +31,7 @@ function AddTaskPage() {
       <Navbar />
       <div className="add-task-container">
         <h1 className="add-task-title">Add Task</h1>
+
         <div className="add-task-card">
           <div className="add-task-field">
             <label className="add-task-label">Title</label>
@@ -43,7 +51,10 @@ function AddTaskPage() {
               className="add-task-textarea"
               value={newTask.description}
               onChange={(e) =>
-                setNewTask({ ...newTask, description: e.target.value })
+                setNewTask({
+                  ...newTask,
+                  description: e.target.value,
+                })
               }
             />
           </div>

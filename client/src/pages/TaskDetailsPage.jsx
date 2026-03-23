@@ -9,7 +9,8 @@ function TaskDetailsPage() {
   React.useEffect(() => {
     const fetchTaskDetails = async () => {
       try {
-        const response = await fetch(`/api/tasks/${id}`); ////
+        // endpoint 6 : "/api/tasks/:id"
+        const response = await fetch(`/api/tasks/${id}`);
         const data = await response.json();
         setTask(data);
       } catch (error) {
@@ -22,12 +23,10 @@ function TaskDetailsPage() {
 
   return (
     <div>
-      <Navbar />
       {task ? (
         <div>
           <h1>{task.title}</h1>
           <p>{task.description}</p>
-          /////////////////////////////
         </div>
       ) : (
         <p>Task not found</p>

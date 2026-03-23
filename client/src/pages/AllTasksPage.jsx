@@ -9,7 +9,8 @@ function AllTasksPage() {
   React.useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const response = await fetch("/api/all-tasks"); ////
+
+        const response = await fetch("/api/tasks/all-tasks");
         const data = await response.json();
         setTasks(data);
       } catch (error) {
@@ -24,6 +25,7 @@ function AllTasksPage() {
     <div>
       <Navbar />
       <h1>All Tasks Available:</h1>
+
       <ul>
         {tasks.map((task) => (
           <li key={task.id}>
