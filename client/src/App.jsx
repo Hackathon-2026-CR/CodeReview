@@ -5,6 +5,7 @@ import AllTasksPage from './pages/AllTasksPage'
 import MyTasksPage from './pages/MyTasksPage'
 import AddTaskPage from './pages/AddTaskPage'
 import TaskDetailsPage from './pages/TaskDetailsPage'
+import AccountPage from './pages/AccountInfosPage'
 
 function App() {
 
@@ -17,6 +18,7 @@ function App() {
           <Route path="/my-tasks" element={<MyTasksPage />} />
           <Route path="/add-task" element={<AddTaskPage />} />
           <Route path="/task-details/:id" element={<TaskDetailsPage />} />
+          <Route path="/account" element={<AccountPage />} />
         </Routes>
       </Router>
     </div>
