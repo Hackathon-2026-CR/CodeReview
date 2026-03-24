@@ -1,24 +1,24 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "../styles/AddTaskPage.css";
 import Navbar from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
 
 export default function AddTaskPage() {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [mode, setMode] = useState("file");
+  const [fileKey, setFileKey] = useState(0);
 
   const [taskData, setTaskData] = useState({
     title: "",
-    user_name: "",
+    user_name: localStorage.getItem("username") || "",
     languages: "",
     description: "",
     groups: "",
     price: 0,
     code: "",
     file: null,
-    mode: null,
   });
-
-  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -31,146 +31,133 @@ export default function AddTaskPage() {
     }
   };
 
+  const resetForm = () => {
+    setTaskData({
+      title: "",
+      user_name: localStorage.getItem("username") || "",
+      languages: "",
+      description: "",
+      groups: "",
+      price: 0,
+      code: "",
+      file: null,
+    });
+    setFileKey((prev) => prev + 1);
+  };
+
   const handleSubmit = async () => {
-    if (!taskData.title || !taskData.user_name || !taskData.price) {
-      alert("Please fill in all required fields: Title, User Name, Price.");
+    if (
+      !taskData.title ||
+      !taskData.user_name ||
+      !taskData.languages ||
+      !taskData.price ||
+      (mode === "manual" && !taskData.code) ||
+      (mode === "file" && !taskData.file)
+    ) {
+      alert(
+        "Please fill all required fields: Title, User Name, Languages, Price" +
+          (mode === "manual" ? ", Code" : ", File"),
+      );
       return;
     }
 
     setLoading(true);
 
-    const url =
-      taskData.mode === "file"
-        ? "http://localhost:8000/api/tasks/add-task-file"
-        : "http://localhost:8000/api/tasks/add-task";
-
-    const body =
-      taskData.mode === "file"
-        ? (() => {
-            const formData = new FormData();
-            Object.entries(taskData).forEach(([key, value]) => {
-              if (value && key !== "mode") formData.append(key, value);
-            });
-            return formData;
-          })()
-        : JSON.stringify({
-            ...taskData,
-            file: undefined,
-            mode: undefined,
-          });
-
-    const headers =
-      taskData.mode === "manual" ? { "Content-Type": "application/json" } : {};
-
     try {
-      const response = await fetch(url, {
-        method: "POST",
-        headers,
-        body,
-      });
-      const data = await response.json();
+      let response;
 
-      setTaskData({
-        title: "",
-        user_name: "",
-        languages: "",
-        description: "",
-        groups: "",
-        price: 0,
-        code: "",
-        file: null,
-        mode: taskData.mode,
-      });
+      if (mode === "file") {
+        const formData = new FormData();
+        formData.append("title", taskData.title);
+        formData.append("user_name", taskData.user_name);
+        formData.append("languages", taskData.languages);
+        formData.append("description", taskData.description);
+        formData.append("groups", taskData.groups);
+        formData.append("price", taskData.price);
+        formData.append("file", taskData.file);
 
-      alert("Task added successfully!");
+        response = await fetch(
+          "http://localhost:8000/api/tasks/add-task-file",
+          {
+            method: "POST",
+            body: formData,
+          },
+        );
+      } else {
+        response = await fetch("http://localhost:8000/api/tasks/add-task", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: taskData.title,
+            user_name: taskData.user_name,
+            languages: taskData.languages,
+            description: taskData.description,
+            groups: taskData.groups,
+            price: taskData.price,
+            code: taskData.code,
+          }),
+        });
+      }
+
+      if (response.status === 400) {
+        alert("Invalid data. Please check your inputs.");
+        return;
+      }
+      if (response.status === 401) {
+        alert("You are not logged in.");
+        return;
+      }
+      if (!response.ok) {
+        alert("Something went wrong. Please try again.");
+        return;
+      }
+
+      resetForm();
       navigate("/all-tasks");
     } catch (err) {
-      console.error("Error adding task:", err);
-      alert("Error adding task!");
+      alert("Network error. Check your internet connection.");
     } finally {
       setLoading(false);
     }
   };
 
-  if (!taskData.mode) {
-    return (
-      <div>
-        <Navbar />
-        <div className="add-task-mode-select">
-          <h1 className="add-task-mode-title">Add New Task</h1>
-          <button
-            className="add-task-mode-btn"
-            onClick={() => setTaskData({ ...taskData, mode: "manual" })}
-          >
-            Write Code Manually
-          </button>
-          <button
-            className="add-task-mode-btn"
-            onClick={() => setTaskData({ ...taskData, mode: "file" })}
-          >
-            Upload a File
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div>
       <Navbar />
       <div className="add-task-container">
-        <div className="add-task-header">
-          <h1 className="add-task-title">
-            {taskData.mode === "manual"
-              ? "Add Task — Manual"
-              : "Add Task — File"}
-          </h1>
-          <button
-            className="add-task-back-btn"
-            onClick={() => setTaskData({ ...taskData, mode: null })}
-          >
-            ← Change method
-          </button>
-        </div>
+        <h1 className="add-task-title">Add New Task</h1>
 
         <div className="add-task-card">
-          {/* Title */}
           <div className="add-task-field">
             <label className="add-task-label">Title *</label>
             <input
               className="add-task-input"
-              type="text"
               name="title"
               value={taskData.title}
               onChange={handleChange}
             />
           </div>
 
-          {/* User Name */}
           <div className="add-task-field">
             <label className="add-task-label">User Name *</label>
             <input
               className="add-task-input"
-              type="text"
               name="user_name"
               value={taskData.user_name}
               onChange={handleChange}
             />
           </div>
 
-          {/* Languages */}
           <div className="add-task-field">
-            <label className="add-task-label">Languages</label>
+            <label className="add-task-label">Languages *</label>
             <input
               className="add-task-input"
-              type="text"
               name="languages"
               value={taskData.languages}
               onChange={handleChange}
             />
           </div>
 
-          {/* Description */}
           <div className="add-task-field">
             <label className="add-task-label">Description</label>
             <textarea
@@ -181,32 +168,40 @@ export default function AddTaskPage() {
             />
           </div>
 
-          {/* Groups */}
           <div className="add-task-field">
             <label className="add-task-label">Groups</label>
             <input
               className="add-task-input"
-              type="text"
               name="groups"
               value={taskData.groups}
               onChange={handleChange}
             />
           </div>
 
-          {/* Price */}
           <div className="add-task-field">
             <label className="add-task-label">Price *</label>
             <input
-              className="add-task-input"
               type="number"
+              className="add-task-input"
               name="price"
               value={taskData.price}
               onChange={handleChange}
             />
           </div>
 
-          {/* Code ou File */}
-          {taskData.mode === "manual" ? (
+          <div className="add-task-field">
+            <label className="add-task-label">Type *</label>
+            <select
+              className="add-task-input"
+              value={mode}
+              onChange={(e) => setMode(e.target.value)}
+            >
+              <option value="manual">Manual Code</option>
+              <option value="file">Upload File</option>
+            </select>
+          </div>
+
+          {mode === "manual" ? (
             <div className="add-task-field">
               <label className="add-task-label">Code *</label>
               <textarea
@@ -220,18 +215,22 @@ export default function AddTaskPage() {
             <div className="add-task-field">
               <label className="add-task-label">File *</label>
               <input
-                className="add-task-input"
+                key={fileKey}
                 type="file"
+                className="add-task-input"
                 name="file"
                 onChange={handleChange}
               />
-              {taskData.file && <p>Selected file: {taskData.file.name}</p>}
+              {taskData.file && (
+                <p className="add-task-file-name">
+                  Selected: {taskData.file.name}
+                </p>
+              )}
             </div>
           )}
 
           <button
             className="add-task-btn"
-            type="button"
             onClick={handleSubmit}
             disabled={loading}
           >
