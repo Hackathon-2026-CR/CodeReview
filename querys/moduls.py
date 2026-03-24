@@ -3,9 +3,7 @@ from pydantic import BaseModel
 class TaskCreate(BaseModel):
     title: str
     user_name: str
-    languages: str
+    languages: list[str]
     description: str | None = None
-    groups: list
-    status: str
-    reviewer: str
+    groups: list[str] = ["public"]    
     price: int
