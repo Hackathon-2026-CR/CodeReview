@@ -1,9 +1,5 @@
 import { useState } from "react";
-
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import "../styles/Navbar.css";
-
-import { useUser, useClerk } from "@clerk/clerk-react";
 
 
 const pages = [
@@ -17,11 +13,11 @@ const pages = [
 export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const location = useLocation();
-  const { user } = useUser();
-  const { signOut } = useClerk();
+  const navigate = useNavigate();
 
-  const handleLogout = async () => {
-    await signOut();
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
   };
 
   return (
@@ -46,7 +42,7 @@ export default function Navbar() {
           className="navbar-account-btn"
           onClick={() => setDropdownOpen((prev) => !prev)}
         >
-          {user?.firstName || user?.emailAddresses?.[0]?.emailAddress || "Account"}
+          My Account
         </button>
 
         {dropdownOpen && (
