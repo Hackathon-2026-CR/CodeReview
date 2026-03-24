@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import Navbar from "../components/Navbar";
 
 function MyTasksPage() {
   const [myTasks, setMyTasks] = React.useState([]);
@@ -11,8 +12,11 @@ function MyTasksPage() {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
+
         if (!user?.username) return;
-        const response = await fetch(`/api/tasks/my-tasks/${user.username}`);
+        const response = await fetch(
+          `http://localhost:8000/api/tasks/my-tasks/${user.username}`,
+        );
         const data = await response.json();
         setMyTasks(data);
       } catch (error) {
@@ -27,7 +31,9 @@ function MyTasksPage() {
     const fetchWorkingTasks = async () => {
       try {
         if (!user?.username) return;
-        const response = await fetch(`/api/tasks/working-tasks/${user.username}`);
+        const response = await fetch(
+          `http://localhost:8000/api/tasks/working-tasks/${user.username}`,
+        );
         const data = await response.json();
         setWorkingTasks(data);
       } catch (error) {
@@ -40,6 +46,7 @@ function MyTasksPage() {
 
   return (
     <div>
+      <Navbar />
       <div className="my-tasks-page">
         <div>
           <h1>Tasks I'm working on :</h1>

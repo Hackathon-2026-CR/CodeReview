@@ -5,11 +5,10 @@ import AllTasksPage from './pages/AllTasksPage'
 import MyTasksPage from './pages/MyTasksPage'
 import AddTaskPage from './pages/AddTaskPage'
 import TaskDetailsPage from './pages/TaskDetailsPage'
-import AccountInfosPage from './pages/AccountInfosPage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
-import Navbar from './components/Navbar'
 import ProtectedRoute from './components/ProtectedRoute'
+import AccountPage from './pages/AccountInfosPage'
 
 function App() {
   return (
@@ -24,7 +23,6 @@ function App() {
             element={
               <ProtectedRoute>
                 <>
-                  <Navbar />
                   <HomePage />
                 </>
               </ProtectedRoute>
@@ -35,7 +33,6 @@ function App() {
             element={
               <ProtectedRoute>
                 <>
-                  <Navbar />
                   <AllTasksPage />
                 </>
               </ProtectedRoute>
@@ -46,7 +43,6 @@ function App() {
             element={
               <ProtectedRoute>
                 <>
-                  <Navbar />
                   <MyTasksPage />
                 </>
               </ProtectedRoute>
@@ -57,7 +53,6 @@ function App() {
             element={
               <ProtectedRoute>
                 <>
-                  <Navbar />
                   <AddTaskPage />
                 </>
               </ProtectedRoute>
@@ -68,7 +63,6 @@ function App() {
             element={
               <ProtectedRoute>
                 <>
-                  <Navbar />
                   <TaskDetailsPage />
                 </>
               </ProtectedRoute>
@@ -78,7 +72,7 @@ function App() {
             path="/account"
             element={
               <ProtectedRoute>
-                <AccountInfosPage />
+                <AccountPage />
               </ProtectedRoute>
             }
           />

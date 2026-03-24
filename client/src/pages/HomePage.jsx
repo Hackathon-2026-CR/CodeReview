@@ -1,5 +1,6 @@
 import React from "react";
 import { useAuth } from "../context/AuthContext";
+import Navbar from "../components/Navbar";
 
 function HomePage() {
   const [user, setUser] = React.useState(null);
@@ -9,8 +10,9 @@ function HomePage() {
     const fetchUser = async () => {
       try {
         if (!authUser?.username) return;
-
-        const response = await fetch(`/api/users/${authUser.username}`);
+        const response = await fetch(
+          `http://localhost:8000/api/users/${authUser.username}`,
+        );
         const data = await response.json();
         setUser(data);
       } catch (error) {
@@ -23,6 +25,7 @@ function HomePage() {
 
   return (
     <div>
+      <Navbar />
       <div className="home-page">
         <h1>Welcome to CodeReview app !</h1>
 
