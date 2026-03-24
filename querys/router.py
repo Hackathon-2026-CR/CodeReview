@@ -19,9 +19,13 @@ def get_tasks_created_by_user(user_name):
     return dal.published_codes(user_name)
 
 
-@router.get('/working-tasks/{user_name}')
-def get_tasks_the_user_is_currently_working_on(user_name):
-    return dal.working_on(user_name)
+@router.get('/working-tasks/{reviwer_name}')
+def get_tasks_the_user_is_currently_working_on(reviwer_name):
+    return dal.working_on(reviwer_name)
+
+@router.get('/finished-tasks/{reviwer_name}')
+def get_tasks_the_user_has_finished(reviwer_name):
+    return dal.finished(reviwer_name)
 
 
 # @router.post('/add-task')

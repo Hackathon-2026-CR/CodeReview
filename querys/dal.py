@@ -74,28 +74,48 @@ def published_codes(username): # 2
         print(f"Database error: {err}")
 
 
-def working_on(username): # 3
+def working_on(reviwer_name): # 3
 
     try:
         query = """
         SELECT * FROM tasks
-        WHERE reviewer_name = %s
+        WHERE reviewer = %s AND status = 'review in process'
         """
 
-        cursor.execute(query, [username])
+        cursor.execute(query, [reviwer_name])
         answer = cursor.fetchall()
         response = []
         if answer:
             for row in answer:
                 response.append(row)
-            cursor_to_dict(response)
+            return cursor_to_dict(response) 
         else:
-            print(f"No codes found for reviewer: {username}")
+            print(f"No codes found for reviewer: {reviwer_name}")
 
     except mysql.connector.Error as err:
         print(f"Database error: {err}")
 
 
+def finished(reviwer_name): # 4
+
+    try:
+        query = """
+        SELECT * FROM tasks
+        WHERE reviewer = %s AND status = 'reviewed'
+        """
+
+        cursor.execute(query, [reviwer_name])
+        answer = cursor.fetchall()
+        response = []
+        if answer:
+            for row in answer:
+                response.append(row)
+            return cursor_to_dict(response)
+        else:
+            print(f"No codes found for reviewer: {reviwer_name}")
+
+    except mysql.connector.Error as err:
+        print(f"Database error: {err}")
 
 
 def get_available_by_user(username): # 5
@@ -132,7 +152,7 @@ def get_available_by_user(username): # 5
 def get_full_task_by_id(id): # 6
     try:
         query = """
-        SELECT * FROM users
+        SELECT * FROM tasks
         WHERE id = %s
         """
 
@@ -206,9 +226,7 @@ def add_task_manually(
     except Exception as err:
         return {"error from dal": str(err)}
     
-# 9 
-def add_new_user():
-    
+
 # python -m querys.dal 
 
 
