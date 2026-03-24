@@ -1,15 +1,16 @@
 import React from "react";
+import { useAuth } from "../context/AuthContext";
 
 function HomePage() {
   const [user, setUser] = React.useState(null);
+  const { user: authUser } = useAuth();
 
   React.useEffect(() => {
     const fetchUser = async () => {
       try {
-        const username = localStorage.getItem("username");
-        if (!username) return;
+        if (!authUser?.username) return;
 
-        const response = await fetch(`/api/users/${username}`);
+        const response = await fetch(`/api/users/${authUser.username}`);
         const data = await response.json();
         setUser(data);
       } catch (error) {
@@ -18,7 +19,7 @@ function HomePage() {
     };
 
     fetchUser();
-  }, []);
+  }, [authUser?.username]);
 
   return (
     <div>
