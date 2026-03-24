@@ -1,5 +1,5 @@
-from hacaton.utils.connection import get_connection
-from querys.moduls import TaskCreate
+from data.hacaton.utils.connection import get_connection
+# from data.querys.moduls import TaskCreate
 import mysql.connector
 import json
 from fastapi import APIRouter, Form, File, UploadFile
@@ -132,7 +132,7 @@ def get_available_by_user(username): # 5
         FROM tasks t
         JOIN users u ON u.name = %s
         WHERE JSON_OVERLAPS(t.groups, u.`groups`) 
-           OR JSON_CONTAINS(t.groups, '"public"');
+           OR JSON_CONTAINS(t.groups, '"public"') AND status = waiting for review;
         """
         cursor.execute(query, groups)
         answer = cursor.fetchall()
@@ -140,7 +140,7 @@ def get_available_by_user(username): # 5
         if answer:
             for row in answer:
                 response.append(row)
-            cursor_to_dict(response)
+            return cursor_to_dict(response)
         
         else:
             print(f"No codes found for reviewer: {username}")
@@ -227,6 +227,6 @@ def add_task_manually(
         return {"error from dal": str(err)}
     
 
-# python -m querys.dal 
+# python -m data.querys.dal 
 
 

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Form, File, UploadFile
-from querys import dal
-from querys.moduls import TaskCreate
+from data.querys import dal
+from data.querys.moduls import TaskCreate
 
 
 router = APIRouter(
