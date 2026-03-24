@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Form, File, UploadFile
 from querys import dal
 from querys.moduls import TaskCreate
 
@@ -28,6 +28,10 @@ def get_tasks_the_user_is_currently_working_on(user_name):
 def add_task(task: TaskCreate):
     return dal.add_task_to_codes(task)
 
+@router.post('/add-task_upload_file')
+async def add_task_upload_file(file: UploadFile = File(...)):
+    return dal.add_task_upload_file(file)
+
 
 @router.get('/all-tasks/{user_name}')
 def get_all_tasks(user_name):
@@ -37,3 +41,15 @@ def get_all_tasks(user_name):
 @router.get('/{id}')
 def get_task_using_id(id):
     pass
+
+
+# @router.post('/add-new-task')
+# async def add_newtask(
+#     title: str = Form(...),
+#     user_name: str = Form(...),
+#     languages: str = Form("Python"),
+#     description: str | None = Form(None),
+#     groups: str = Form("public"),
+#     price: int = Form(...),
+# ):
+#     return dal.add_new_task(title, user_name, languages, description, groups, price)

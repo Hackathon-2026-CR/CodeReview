@@ -25,7 +25,7 @@ price: int [how much he willing to pay for a review]
 
 title, user_name ,languages, description, groups, status, price
 
-
+python -m uvicorn querys.main:app --reload
 
 
 reviews: [only available to the client and the reviewer]

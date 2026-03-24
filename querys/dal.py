@@ -2,9 +2,10 @@ from hacaton.utils.connection import get_connection
 from querys.moduls import TaskCreate
 import mysql.connector
 import json
+from fastapi import APIRouter, Form, File, UploadFile
+
 
 connection, cursor =  get_connection()
-
 
 def cursor_to_dict(data):
     if data is None:
@@ -17,7 +18,7 @@ def cursor_to_dict(data):
         rating = row_dict.get("rating")
         if rating:
             row_dict["rating"] = float(rating)
-
+        
         return row_dict
 
     # if data is list of rows
@@ -39,6 +40,7 @@ def get_user(username):  # 1
         SELECT * FROM users
         WHERE name = %s
         """
+        print(cursor)
         cursor.execute(query, [username])
         row = cursor.fetchone()
         return cursor_to_dict(row)
@@ -163,10 +165,73 @@ def get_task_by_id(id): # 6
     except mysql.connector.Error as err:
         print(f"Database error: {err}")
 
+# 7
+import json
+
+def add_task_upload_file(file: UploadFile):
+    try:
+        file_content = file.file.read().decode('utf-8')
+        task_data = json.loads(file_content) 
+
+        task_dict = {
+            "title": task_data["title"],
+            "user_name": task_data["user_name"],
+            "languages": json.dumps(task_data["languages"]),
+            "description": task_data.get("description"),
+            "groups": json.dumps(task_data["groups"]),
+            "price": task_data["price"]
+        }
+
+        insert_query = """
+        INSERT INTO tasks (title, user_name, languages, description, `groups`, price)
+        VALUES (%(title)s, %(user_name)s, %(languages)s, %(description)s, %(groups)s, %(price)s)
+        """
+
+        cursor.execute(insert_query, task_dict)
+        connection.commit()
+        
+        return {
+            "response": f"task '{task_dict['title']}' added"
+        }
+    except json.JSONDecodeError as err:
+        return {"error": f"Invalid JSON: {err}"}
+    except Exception as err:
+        return {"error": str(err)}
 
 
+# ---------------------------------------------------------------------
 
 
+def add_new_task(
+    title: str, user_name: str, languages: str,
+    description: str | None, groups: str, price: int
+):
+    try:
+        
+        task_dict = {
+            "title": title,                    
+            "user_name": user_name,
+            "languages": json.dumps(languages.split(",")),
+            "description": description,
+            "groups": json.dumps(groups.split(",")),
+            "price": price,
+        }
+
+        insert_query = """
+        INSERT INTO tasks (title, user_name, languages, description, `groups`, price, code_content)
+        VALUES (%(title)s, %(user_name)s, %(languages)s, %(description)s, %(groups)s, %(price)s, %(code_content)s)
+        """
+
+        cursor.execute(insert_query, task_dict)
+        connection.commit()
+        
+        return {
+            "response": f"task '{task_dict['title']}' added"
+        }
+    except Exception as err:
+        return {"error from dal": str(err)}
+    
+    
 # python -m querys.dal 
 
 
