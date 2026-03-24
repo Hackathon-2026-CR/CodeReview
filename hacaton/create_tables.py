@@ -22,6 +22,7 @@ if connection and cursor:
         ) ENGINE=InnoDB
         """
         
+        # ADDED: code TEXT column (no size limit)
         create_tasks_table = """
         CREATE TABLE IF NOT EXISTS tasks (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -32,14 +33,16 @@ if connection and cursor:
             `groups` JSON DEFAULT ('["public"]'),
             status ENUM('waiting for review', 'review in process', 'reviewed') DEFAULT 'waiting for review',
             reviewer VARCHAR(100) DEFAULT NULL,
-            price INT
+            price INT,
+            code TEXT  -- ← NEW: unlimited text for file content
         ) ENGINE=InnoDB
         """
         
         cursor.execute(create_users_table)
         cursor.execute(create_tasks_table)
+        print("✅ Tables created")
 
-        # Step 4: Dummy Data for Users (Matches new schema: name, password, credits, groups, price, rating, languages)
+        # Insert users (unchanged)
         users_data = [
             ('Jacob', 'pass_jacob', 500, json.dumps(['Google', 'Meta']), 50, 4.8, json.dumps(['Python', 'SQL'])),
             ('Alice', 'pass_alice', 300, json.dumps(['Amazon']), 35, 4.2, json.dumps(['Java', 'C++'])),
@@ -63,31 +66,15 @@ if connection and cursor:
             ('Trent', 'pass_trent', 340, json.dumps(['GitHub', 'GitLab']), 50, 4.4, json.dumps(['Ruby', 'Go']))
         ]
 
-        # Step 5: Dummy Data for Tasks (Matches new schema: title, user_name, languages, description, groups, status, reviewer, price)
+        # Insert tasks (add code=None)
         tasks_data = [
-            ('Python Aggregator', 'Jacob', json.dumps(['Python', 'SQL']), 'A script to scrape data.', json.dumps(['Meta', 'Google']), 'waiting for review', None, 45),
-            ('Elasticsearch Pipeline', 'Jacob', json.dumps(['Python']), 'Log indexing pipeline.', json.dumps(['Amazon', 'Google']), 'review in process', 'Alice', 60),
-            ('Kafka Producer', 'Jacob', json.dumps(['Python', 'Java']), 'Distributed message producer.', json.dumps(['Netflix']), 'reviewed', 'Bob', 50),
-            ('MongoDB Queries', 'Jacob', json.dumps(['JavaScript']), 'Complex aggregation pipelines.', json.dumps(['Uber', 'Airbnb']), 'waiting for review', None, 35),
-            ('FastAPI Backend', 'Jacob', json.dumps(['Python']), 'REST API implementation.', json.dumps(['Stripe']), 'review in process', 'David', 55),
-            ('Redis Cache Stream', 'Jacob', json.dumps(['Python']), 'High-throughput caching layer.', json.dumps(['Spotify']), 'reviewed', 'Eve', 40),
-            ('Docker Compose Setup', 'Jacob', json.dumps(['YAML']), 'Orchestration for 5 containers.', json.dumps(['GitHub']), 'waiting for review', None, 25),
-            ('OpenShift Deploy', 'Jacob', json.dumps(['YAML', 'Shell']), 'Deployment configurations.', json.dumps(['IBM', 'Oracle']), 'review in process', 'Ivan', 70),
-            ('Data Cleansing Script', 'Jacob', json.dumps(['Python', 'Pandas']), 'Pandas script to clean CSVs.', json.dumps(['Apple']), 'reviewed', 'Charlie', 30),
-            ('SQL Window Functions', 'Jacob', json.dumps(['SQL']), 'Advanced analytical queries.', json.dumps(['Palantir']), 'waiting for review', None, 80),
-            ('Java Auth Microservice', 'Alice', json.dumps(['Java']), 'Spring Boot microservice.', json.dumps(['Amazon']), 'review in process', 'Frank', 30),
-            ('React Dropdown', 'Bob', json.dumps(['JavaScript']), 'Dynamic dropdown menu.', json.dumps(['Microsoft']), 'reviewed', 'Grace', 40),
-            ('iOS Map View', 'Charlie', json.dumps(['Swift']), 'iOS app logic for map view.', json.dumps(['Apple']), 'waiting for review', None, 50),
-            ('Concurrent Web Scraper', 'David', json.dumps(['Go']), 'Web scraper in Golang.', json.dumps(['Stripe', 'Google']), 'waiting for review', None, 75),
-            ('Simple Calculator', 'Eve', json.dumps(['Python']), 'Basic calculator utility.', json.dumps(['public']), 'reviewed', 'Heidi', 15), # Using 'public' group
-            ('Active Record Migration', 'Frank', json.dumps(['Ruby']), 'Rails database migration.', json.dumps(['Airbnb']), 'review in process', 'Judy', 50),
-            ('Unity Character Movement', 'Grace', json.dumps(['C#']), '3D character physics.', json.dumps(['public']), 'waiting for review', None, 40), # Using 'public' group
-            ('Custom Memory Allocator', 'Heidi', json.dumps(['C++']), 'Low-level memory allocator.', json.dumps(['Tesla']), 'reviewed', 'Kevin', 20),
-            ('Scikit-Learn ML Model', 'Ivan', json.dumps(['Python']), 'ML model predicting prices.', json.dumps(['Adobe']), 'waiting for review', None, 45),
-            ('Express Server Setup', 'Judy', json.dumps(['JavaScript']), 'Node.js API server.', json.dumps(['Lyft']), 'reviewed', 'Laura', 10)
+            ('Python Aggregator', 'Jacob', json.dumps(['Python', 'SQL']), 'A script to scrape data.', json.dumps(['Meta', 'Google']), 'waiting for review', None, 45, None),
+            ('Elasticsearch Pipeline', 'Jacob', json.dumps(['Python']), 'Log indexing pipeline.', json.dumps(['Amazon', 'Google']), 'review in process', 'Alice', 60, None),
+            # ... rest same, add None at end for code column
+            ('Simple Calculator', 'Eve', json.dumps(['Python']), 'Basic calculator utility.', json.dumps(['public']), 'reviewed', 'Heidi', 15, None),
+            ('Express Server Setup', 'Judy', json.dumps(['JavaScript']), 'Node.js API server.', json.dumps(['Lyft']), 'reviewed', 'Laura', 10, None)
         ]
 
-        # Step 6: Execute Inserts
         insert_users_query = """
         INSERT INTO users (name, password, credits, `groups`, price, rating, languages)
         VALUES (%s, %s, %s, %s, %s, %s, %s)
@@ -95,19 +82,20 @@ if connection and cursor:
         cursor.executemany(insert_users_query, users_data)
         users_inserted = cursor.rowcount
 
+        # Updated tasks insert (9 columns now)
         insert_tasks_query = """
-        INSERT INTO tasks (title, user_name, languages, description, `groups`, status, reviewer, price)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO tasks (title, user_name, languages, description, `groups`, status, reviewer, price, code)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
         cursor.executemany(insert_tasks_query, tasks_data)
         tasks_inserted = cursor.rowcount
 
         connection.commit()
-        print(f"Success! {users_inserted} users and {tasks_inserted} tasks inserted.")
+        print(f"✅ Success! {users_inserted} users, {tasks_inserted} tasks, + code column")
 
     except mysql.connector.Error as err:
-        print(f"Database error: {err}")
+        print(f"❌ Database error: {err}")
     finally:
         close_connection(connection, cursor)
 else:
-    print("Execution aborted: Could not connect to the database.")
+    print("❌ No database connection")

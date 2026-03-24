@@ -26,7 +26,7 @@ def get_connection():
             print(f"Database error: {err}")
         return None, None
 
-
+get_connection()
 
 def close_connection(connection, cursor):
     if cursor is not None:

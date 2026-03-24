@@ -1,24 +1,55 @@
 from hacaton.utils.connection import get_connection
+from querys.moduls import TaskCreate
 import mysql.connector
 import json
+from fastapi import APIRouter, Form, File, UploadFile
+
 
 connection, cursor =  get_connection()
 
+def cursor_to_dict(data):
+    if data is None:
+        return None
 
-def get_user(username):
+    if isinstance(data, tuple):
+        # single row
+        row_dict = dict(zip(cursor.column_names, data))
+
+        rating = row_dict.get("rating")
+        if rating:
+            row_dict["rating"] = float(rating)
+        
+        return row_dict
+
+    # if data is list of rows
+    response = []
+    for row in data:
+        row_dict = dict(zip(cursor.column_names, row))
+
+        rating = row_dict.get("rating")
+        if rating:
+            row_dict["rating"] = float(rating) # make it float and not decimal
+
+        response.append(row_dict)
+
+    return response
+
+def get_user(username):  # 1
     try:
         query = """
         SELECT * FROM users
         WHERE name = %s
         """
-
-
+        print(cursor)
         cursor.execute(query, [username])
-        answer = cursor.fetchone()
-        return answer
+        row = cursor.fetchone()
+        return cursor_to_dict(row)
 
     except mysql.connector.Error as err:
         print(f"Database error: {err}")
+        return {"response": "this username don't exist"}
+    
+
 
 def published_codes(username): # 2
 
@@ -35,7 +66,7 @@ def published_codes(username): # 2
             # print(f"Found {len(answer)} codes for {username}:")
             for row in answer:
                 response.append(row)
-            return response
+            return cursor_to_dict(response)
         else:
             print(f"No codes found for user: {username}")
 
@@ -43,43 +74,48 @@ def published_codes(username): # 2
         print(f"Database error: {err}")
 
 
-
-
-def working_on(username): # 3
+def working_on(reviwer_name): # 3
 
     try:
         query = """
         SELECT * FROM tasks
-        WHERE reviewer_name = %s
+        WHERE reviewer = %s AND status = 'review in process'
         """
 
-        cursor.execute(query, [username])
+        cursor.execute(query, [reviwer_name])
         answer = cursor.fetchall()
         response = []
         if answer:
             for row in answer:
                 response.append(row)
+            return cursor_to_dict(response) 
         else:
-            print(f"No codes found for reviewer: {username}")
+            print(f"No codes found for reviewer: {reviwer_name}")
 
     except mysql.connector.Error as err:
         print(f"Database error: {err}")
 
 
+def finished(reviwer_name): # 4
 
-def add_task_to_codes(task): # 4
     try:
-        insert_query = """
-        INSERT INTO tasks (title, user_name ,languages, description, groups, status, price)
-        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        query = """
+        SELECT * FROM tasks
+        WHERE reviewer = %s AND status = 'reviewed'
         """
 
-        cursor.execute(insert_query, **task)
-        connection.commit()
-        return {"response": f"task {task['title']} added"}
+        cursor.execute(query, [reviwer_name])
+        answer = cursor.fetchall()
+        response = []
+        if answer:
+            for row in answer:
+                response.append(row)
+            return cursor_to_dict(response)
+        else:
+            print(f"No codes found for reviewer: {reviwer_name}")
 
     except mysql.connector.Error as err:
-        return f"Database error: {err}"
+        print(f"Database error: {err}")
 
 
 def get_available_by_user(username): # 5
@@ -104,7 +140,7 @@ def get_available_by_user(username): # 5
         if answer:
             for row in answer:
                 response.append(row)
-            return response
+            cursor_to_dict(response)
         
         else:
             print(f"No codes found for reviewer: {username}")
@@ -113,23 +149,83 @@ def get_available_by_user(username): # 5
         return f"Database error: {err}"
 
 
-def get_task_by_id(id): # 6
+def get_full_task_by_id(id): # 6
     try:
         query = """
-        SELECT * FROM users
+        SELECT * FROM tasks
         WHERE id = %s
         """
 
         cursor.execute(query, [id])
         answer = cursor.fetchone()
-        return answer
+        return cursor_to_dict(answer)
 
     except mysql.connector.Error as err:
         print(f"Database error: {err}")
 
+# 7
+def add_task_upload_file(
+    title: str, user_name: str, languages: str,
+    description: str | None, groups: str, price: int, file: UploadFile
+):
+    try:
+        code = file.file.read().decode('utf-8')
+        code = json.loads(code) 
+        task_dict = {
+            "title": title,                    
+            "user_name": user_name,
+            "languages": json.dumps(languages.split(",")),
+            "description": description,
+            "groups": json.dumps(groups.split(",")),
+            "price": price,
+            "code": code
+        }
 
+        insert_query = """
+        INSERT INTO tasks (title, user_name, languages, description, `groups`, price, code)
+        VALUES (%(title)s, %(user_name)s, %(languages)s, %(description)s, %(groups)s, %(price)s, %(code)s)
+        """
 
+        cursor.execute(insert_query, task_dict)
+        connection.commit()
+        
+        return {
+            "response": f"task '{task_dict['title']}' added"
+        }
+    except Exception as err:
+        return {"error from dal": str(err)}
+    
 
+# 8
+def add_task_manually(
+    title: str, user_name: str, languages: str,
+    description: str | None, groups: str, price: int, code: str
+):
+    try: 
+        task_dict = {
+            "title": title,                    
+            "user_name": user_name,
+            "languages": json.dumps(languages.split(",")),
+            "description": description,
+            "groups": json.dumps(groups.split(",")),
+            "price": price,
+            "code": code
+        }
+
+        insert_query = """
+        INSERT INTO tasks (title, user_name, languages, description, `groups`, price, code)
+        VALUES (%(title)s, %(user_name)s, %(languages)s, %(description)s, %(groups)s, %(price)s, %(code)s)
+        """
+
+        cursor.execute(insert_query, task_dict)
+        connection.commit()
+        
+        return {
+            "response": f"task '{task_dict['title']}' added"
+        }
+    except Exception as err:
+        return {"error from dal": str(err)}
+    
 
 # python -m querys.dal 
 

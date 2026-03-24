@@ -1,42 +1,30 @@
 import mysql.connector
-from utils.connection import get_connection, close_connection
 import json
+from decimal import Decimal
+from hacaton.utils.connection import get_connection
 
-connection, cursor =  get_connection()
+connection, cursor = get_connection()
 
-def add_to_codes(code):
+
+def add_to_users(user):
+    """
+    Add user to users table.
+    Expects: {"name": "...", "password": "...", "credits": 200, ...}
+    """
     try:
         insert_query = """
-        INSERT INTO codes (user_name, code_languages, description, groups_of_code, status, price)
-        VALUES (%s, %s, %s, %s, %s, %s)
+        INSERT INTO users (name, password, credits, `groups`, price, rating, languages)
+        VALUES (%(name)s, %(password)s, %(credits)s, %(groups)s, %(price)s, %(rating)s, %(languages)s)
         """
 
-        # hard coded until i get the actual data
-        # new_code_data = code
-        new_code_data = (
-            'Jacob',                                                          # user_name
-            json.dumps(['Python', 'Elasticsearch']),                          # code_languages
-            'Data aggregation pipeline script, please go easy on me',         # description
-            json.dumps(['Google', 'Amazon']),                                 # groups_of_code
-            'waiting for review',                                             # status
-            60                                                                # price
-        )
+        user_data = user.copy()
+        user_data["groups"] = json.dumps(user.get("groups", []))
+        user_data["languages"] = json.dumps(user.get("languages", []))
 
-
-        cursor.execute(insert_query, new_code_data)
+        cursor.execute(insert_query, user_data)
         connection.commit()
+        return {"response": f"user '{user['name']}' added"}
 
     except mysql.connector.Error as err:
         print(f"Database error: {err}")
-    finally:
-        cursor.close()
-        connection.close()
-
-
-
-add_to_codes(1)
-
-
-
-
-
+        return {"error": f"Database error: {err}"}
