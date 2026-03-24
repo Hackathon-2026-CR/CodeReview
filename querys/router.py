@@ -41,9 +41,6 @@ def get_all_tasks(user_name):
 
 @router.get('/{id}')
 def get_task_using_id(id):
-<<<<<<< HEAD
-    return dal.get_task_by_id(id)
-=======
     return dal.get_full_task_by_id(id)
 
 
@@ -72,4 +69,3 @@ async def add_task(
 ):
     return dal.add_task_manually(title, user_name, languages, description, groups, price, code)
     
->>>>>>> f4c4546d4d6278413e9c2d459e18f76f46d390b2
