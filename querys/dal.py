@@ -198,12 +198,6 @@ def get_full_task_by_id(id): # 6
 
 # 8
 def add_task_manually(task_data):  # מקבל אובייקט מסוג AddTask
-    connection_result = get_connection()
-    if isinstance(connection_result, tuple):
-        connection = connection_result[0]
-    else:
-        connection = connection_result
-    cursor = connection.cursor(dictionary=True)  # dictionary=True עוזר לעבוד עם שמות עמודות
 
     try:
         # הכנת הנתונים למסד הנתונים
