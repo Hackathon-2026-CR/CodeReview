@@ -1,16 +1,18 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 function MyTasksPage() {
   const [myTasks, setMyTasks] = React.useState([]);
   const [workingTasks, setWorkingTasks] = React.useState([]);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const username = localStorage.getItem("username");
-        const response = await fetch(`/api/tasks/my-tasks/${username}`);
+        if (!user?.username) return;
+        const response = await fetch(`/api/tasks/my-tasks/${user.username}`);
         const data = await response.json();
         setMyTasks(data);
       } catch (error) {
@@ -19,13 +21,13 @@ function MyTasksPage() {
     };
 
     fetchTasks();
-  }, []);
+  }, [user?.username]);
 
   useEffect(() => {
     const fetchWorkingTasks = async () => {
       try {
-        const username = localStorage.getItem("username");
-        const response = await fetch(`/api/tasks/working-tasks/${username}`);
+        if (!user?.username) return;
+        const response = await fetch(`/api/tasks/working-tasks/${user.username}`);
         const data = await response.json();
         setWorkingTasks(data);
       } catch (error) {
@@ -34,7 +36,7 @@ function MyTasksPage() {
     };
 
     fetchWorkingTasks();
-  }, []);
+  }, [user?.username]);
 
   return (
     <div>
