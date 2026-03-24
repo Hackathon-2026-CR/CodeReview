@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from querys.router import router
+from data.querys.router import router
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title='CodeReview')

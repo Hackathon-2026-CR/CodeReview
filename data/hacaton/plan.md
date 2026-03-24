@@ -5,7 +5,6 @@ password
 credits default: 200
 groups: list [names of company he works for] default: None
 price: int [how much he ask per review]  default: None
-rating [from 0.1 to 5.0] default: None
 languages: list, default: empty list
 
 
