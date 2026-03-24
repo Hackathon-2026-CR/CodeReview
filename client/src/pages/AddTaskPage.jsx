@@ -1,5 +1,4 @@
 import React from "react";
-import Navbar from "../components/Navbar";
 import "../styles/AddTaskPage.css";
 
 function AddTaskPage() {
@@ -28,7 +27,6 @@ function AddTaskPage() {
 
   return (
     <div>
-      <Navbar />
       <div className="add-task-container">
         <h1 className="add-task-title">Add Task</h1>
 

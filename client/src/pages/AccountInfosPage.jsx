@@ -2,10 +2,6 @@ import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import "../styles/AccountInfosPage.css";
 
-import { useState, useEffect } from "react";
-import Navbar from "../components/Navbar";
-import "./AccountPage.css";
-
 const READ_ONLY_FIELDS = ["rating", "credits", "list_of_codes"];
 
 export default function AccountPage() {
@@ -24,12 +20,7 @@ export default function AccountPage() {
 
     const fetchUser = async () => {
       try {
-        const response = await fetch("/api/user", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username }),
-        });
-
+        const response = await fetch(`/api/users/${username}`);
         if (response.status === 404) {
           setError("This account does not exist.");
           return;
