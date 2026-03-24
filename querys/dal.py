@@ -112,7 +112,6 @@ def get_available_by_user(username): # 5
     except mysql.connector.Error as err:
         return f"Database error: {err}"
 
-get_available_by_user()
 
 def get_task_by_id(id): # 6
     try:
