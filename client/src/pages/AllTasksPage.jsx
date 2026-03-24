@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
+
 
 function AllTasksPage() {
   const navigate = useNavigate();
@@ -9,8 +9,8 @@ function AllTasksPage() {
   React.useEffect(() => {
     const fetchTasks = async () => {
       try {
-
-        const response = await fetch("/api/tasks/all-tasks");
+        const username = localStorage.getItem("username");
+        const response = await fetch(`/api/tasks/all-tasks/${username}`);
         const data = await response.json();
         setTasks(data);
       } catch (error) {
@@ -23,7 +23,6 @@ function AllTasksPage() {
 
   return (
     <div>
-      <Navbar />
       <h1>All Tasks Available:</h1>
 
       <ul>

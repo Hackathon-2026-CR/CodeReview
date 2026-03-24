@@ -1,5 +1,4 @@
 import React from "react";
-import Navbar from "../components/Navbar";
 
 function HomePage() {
   const [user, setUser] = React.useState(null);
@@ -7,17 +6,10 @@ function HomePage() {
   React.useEffect(() => {
     const fetchUser = async () => {
       try {
-        // endpoint 1 : "/api/user"
-        const response = await fetch("/api/user", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            username: localStorage.getItem("username"),
-          }),
-        });
+        const username = localStorage.getItem("username");
+        if (!username) return;
 
+        const response = await fetch(`/api/users/${username}`);
         const data = await response.json();
         setUser(data);
       } catch (error) {
@@ -30,7 +22,6 @@ function HomePage() {
 
   return (
     <div>
-      <Navbar />
       <div className="home-page">
         <h1>Welcome to CodeReview app !</h1>
 
