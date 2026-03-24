@@ -151,7 +151,7 @@ def get_available_by_user(username): # 5
         return f"Database error: {err}"
 
 
-def get_task_by_id(id): # 6
+def get_full_task_by_id(id): # 6
     try:
         query = """
         SELECT * FROM users
@@ -160,54 +160,23 @@ def get_task_by_id(id): # 6
 
         cursor.execute(query, [id])
         answer = cursor.fetchone()
-        cursor_to_dict(answer)
+        return cursor_to_dict(answer)
 
     except mysql.connector.Error as err:
         print(f"Database error: {err}")
 
 # 7
-import json
-
-def add_task_upload_file(file: UploadFile):
-    try:
-        file_content = file.file.read().decode('utf-8')
-        task_data = json.loads(file_content) 
-
-        task_dict = {
-            "title": task_data["title"],
-            "user_name": task_data["user_name"],
-            "languages": json.dumps(task_data["languages"]),
-            "description": task_data.get("description"),
-            "groups": json.dumps(task_data["groups"]),
-            "price": task_data["price"]
-        }
-
-        insert_query = """
-        INSERT INTO tasks (title, user_name, languages, description, `groups`, price)
-        VALUES (%(title)s, %(user_name)s, %(languages)s, %(description)s, %(groups)s, %(price)s)
-        """
-
-        cursor.execute(insert_query, task_dict)
-        connection.commit()
-        
-        return {
-            "response": f"task '{task_dict['title']}' added"
-        }
-    except json.JSONDecodeError as err:
-        return {"error": f"Invalid JSON: {err}"}
-    except Exception as err:
-        return {"error": str(err)}
 
 
-# ---------------------------------------------------------------------
 
 
-def add_new_task(
+def add_task_upload_file(
     title: str, user_name: str, languages: str,
-    description: str | None, groups: str, price: int
+    description: str | None, groups: str, price: int, file: UploadFile
 ):
     try:
-        
+        code = file.file.read().decode('utf-8')
+        code = json.loads(code) 
         task_dict = {
             "title": title,                    
             "user_name": user_name,
@@ -215,11 +184,12 @@ def add_new_task(
             "description": description,
             "groups": json.dumps(groups.split(",")),
             "price": price,
+            "code": code
         }
 
         insert_query = """
-        INSERT INTO tasks (title, user_name, languages, description, `groups`, price, code_content)
-        VALUES (%(title)s, %(user_name)s, %(languages)s, %(description)s, %(groups)s, %(price)s, %(code_content)s)
+        INSERT INTO tasks (title, user_name, languages, description, `groups`, price, code)
+        VALUES (%(title)s, %(user_name)s, %(languages)s, %(description)s, %(groups)s, %(price)s, %(code)s)
         """
 
         cursor.execute(insert_query, task_dict)
@@ -231,6 +201,36 @@ def add_new_task(
     except Exception as err:
         return {"error from dal": str(err)}
     
+
+# 8
+def add_task_manually(
+    title: str, user_name: str, languages: str,
+    description: str | None, groups: str, price: int, code: str
+):
+    try: 
+        task_dict = {
+            "title": title,                    
+            "user_name": user_name,
+            "languages": json.dumps(languages.split(",")),
+            "description": description,
+            "groups": json.dumps(groups.split(",")),
+            "price": price,
+            "code": code
+        }
+
+        insert_query = """
+        INSERT INTO tasks (title, user_name, languages, description, `groups`, price, code)
+        VALUES (%(title)s, %(user_name)s, %(languages)s, %(description)s, %(groups)s, %(price)s, %(code)s)
+        """
+
+        cursor.execute(insert_query, task_dict)
+        connection.commit()
+        
+        return {
+            "response": f"task '{task_dict['title']}' added"
+        }
+    except Exception as err:
+        return {"error from dal": str(err)}
     
 # python -m querys.dal 
 
