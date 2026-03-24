@@ -1,16 +1,18 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 
 function AllTasksPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [tasks, setTasks] = React.useState([]);
 
   React.useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const username = localStorage.getItem("username");
-        const response = await fetch(`/api/tasks/all-tasks/${username}`);
+        if (!user?.username) return;
+        const response = await fetch(`/api/tasks/all-tasks/${user.username}`);
         const data = await response.json();
         setTasks(data);
       } catch (error) {
@@ -19,7 +21,7 @@ function AllTasksPage() {
     };
 
     fetchTasks();
-  }, []);
+  }, [user?.username]);
 
   return (
     <div>
