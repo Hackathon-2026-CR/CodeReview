@@ -1,16 +1,67 @@
+/* AddTaskPage.css */
+
 .add-task-container {
   max-width: 550px;
   margin: 2rem auto;
   padding: 0 1rem;
 }
 
+.add-task-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
 .add-task-title {
   font-size: 1.6rem;
   font-weight: bold;
   color: #a78bfa;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0;
 }
 
+/* Mode select */
+.add-task-mode-select {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.add-task-mode-btn {
+  flex: 1;
+  padding: 2rem 1rem;
+  border-radius: 14px;
+  border: 1px solid #a78bfa44;
+  background-color: #1e1e2e;
+  color: #cdd6f4;
+  font-size: 1rem;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    border 0.2s,
+    color 0.2s;
+}
+
+.add-task-mode-btn:hover {
+  background-color: #a78bfa22;
+  border-color: #a78bfa;
+  color: #a78bfa;
+}
+
+/* Back button */
+.add-task-back-btn {
+  background: transparent;
+  border: none;
+  color: #a78bfa;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.add-task-back-btn:hover {
+  text-decoration: underline;
+}
+
+/* Card */
 .add-task-card {
   background-color: #1e1e2e;
   border-radius: 14px;
@@ -21,6 +72,7 @@
   gap: 1.2rem;
 }
 
+/* Field */
 .add-task-field {
   display: flex;
   flex-direction: column;
@@ -33,6 +85,7 @@
   font-weight: 500;
 }
 
+/* Inputs */
 .add-task-input,
 .add-task-textarea {
   background-color: #2a2a3e;
@@ -56,6 +109,26 @@
   min-height: 120px;
 }
 
+/* File input */
+.add-task-input[type="file"] {
+  padding: 6px 12px;
+  cursor: pointer;
+  color: #888;
+}
+
+.add-task-input[type="file"]::-webkit-file-upload-button {
+  background-color: #a78bfa;
+  border: none;
+  color: #1e1e2e;
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+/* Submit button */
 .add-task-btn {
   background-color: #a78bfa;
   border: none;
