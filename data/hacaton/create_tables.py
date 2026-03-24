@@ -22,7 +22,7 @@ if connection and cursor:
         ) ENGINE=InnoDB
         """
         
-        # ADDED: code TEXT column (no size limit)
+        
         create_tasks_table = """
         CREATE TABLE IF NOT EXISTS tasks (
             id INT AUTO_INCREMENT PRIMARY KEY,
