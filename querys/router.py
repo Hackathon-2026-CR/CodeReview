@@ -64,3 +64,4 @@ async def add_task(
     code: str = Form(...)
 ):
     return dal.add_task_manually(title, user_name, languages, description, groups, price, code)
+    

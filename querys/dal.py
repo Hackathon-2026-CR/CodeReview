@@ -98,28 +98,6 @@ def working_on(username): # 3
 
 
 
-def add_task_to_codes(task: TaskCreate): # 4
-    try:
-        insert_query = """
-        INSERT INTO tasks (title, user_name, languages, description, `groups`, price)
-        VALUES (%(title)s, %(user_name)s, %(languages)s, %(description)s, %(groups)s, %(price)s)
-        """
-
-        task = task.model_dump()
-        task['languages'] = json.dumps(task['languages'])
-        task['groups'] = json.dumps(task['groups'])
-
-        cursor.execute(insert_query, task)
-        connection.commit()
-        
-        return {"response": f"task '{task['title']}' added"}
-
-    except mysql.connector.Error as err:
-        return f"Database error: {err}"
-
-
-
-
 def get_available_by_user(username): # 5
     try:
         user = """
@@ -166,10 +144,6 @@ def get_full_task_by_id(id): # 6
         print(f"Database error: {err}")
 
 # 7
-
-
-
-
 def add_task_upload_file(
     title: str, user_name: str, languages: str,
     description: str | None, groups: str, price: int, file: UploadFile
@@ -231,6 +205,9 @@ def add_task_manually(
         }
     except Exception as err:
         return {"error from dal": str(err)}
+    
+# 9 
+def add_new_user():
     
 # python -m querys.dal 
 
