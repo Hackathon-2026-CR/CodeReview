@@ -1,197 +1,197 @@
-import React, { useState } from "react";
-import "../styles/AddTaskPage.css";
+import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
+import "../styles/AccountInfosPage.css";
 
-function AddTaskPage() {
-  const [mode, setMode] = useState("manual"); // "manual" | "file"
+const READ_ONLY_FIELDS = ["rating", "credits", "list_of_codes"];
 
-  const [taskData, setTaskData] = useState({
-    title: "",
-    user_name: "",
-    languages: "",
-    description: "",
-    groups: "",
-    price: 0,
-    code: "",
-    file: null,
-  });
+export default function AccountPage() {
+  const [user, setUser] = useState(null);
+  const [error, setError] = useState(null);
+  const [editingField, setEditingField] = useState(null);
+  const [editValue, setEditValue] = useState("");
 
-  const handleChange = (e) => {
-    setTaskData({ ...taskData, [e.target.name]: e.target.value });
+  useEffect(() => {
+    const username = localStorage.getItem("username");
+
+    if (!username) {
+      setError("You are not logged in. Please log in first.");
+      return;
+    }
+
+    const fetchUser = async () => {
+      try {
+        const response = await fetch(`/api/users/${username}`);
+        if (response.status === 404) {
+          setError("This account does not exist.");
+          return;
+        }
+        if (response.status === 401) {
+          setError("Your session has expired. Please log in again.");
+          return;
+        }
+        if (response.status === 403) {
+          setError("You do not have permission to view this account.");
+          return;
+        }
+        if (!response.ok) {
+          setError("Something went wrong. Please try again later.");
+          return;
+        }
+
+        const data = await response.json();
+        setUser(data);
+      } catch (err) {
+        setError("Network error. Check your internet connection.");
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  const handleEdit = (field, currentValue) => {
+    setEditingField(field);
+    setEditValue(
+      Array.isArray(currentValue) ? currentValue.join(", ") : currentValue,
+    );
   };
 
-  const addTaskManual = async () => {
+  const handleSave = async (field) => {
+    const isArray = Array.isArray(user[field]);
+    const newValue = isArray
+      ? editValue
+          .split(",")
+          .map((v) => v.trim())
+          .filter(Boolean)
+      : editValue;
+
     try {
-      const response = await fetch("http://localhost:8000/api/tasks/add-task", {
+      const response = await fetch("/api/user/update", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title: taskData.title,
-          user_name: taskData.user_name,
-          languages: taskData.languages,
-          description: taskData.description,
-          groups: taskData.groups,
-          price: taskData.price,
-          code: taskData.code,
+          username: localStorage.getItem("username"),
+          field,
+          value: newValue,
         }),
       });
-      const data = await response.json();
-      console.log("Task added (manual):", data);
-    } catch (error) {
-      console.error("Error adding task:", error);
+
+      if (!response.ok) {
+        alert("Failed to update. Please try again.");
+        return;
+      }
+
+      setUser((prev) => ({ ...prev, [field]: newValue }));
+      setEditingField(null);
+    } catch (err) {
+      alert("Network error. Could not save changes.");
     }
   };
 
-  const addTaskFile = async () => {
-    try {
-      const formData = new FormData();
-      formData.append("title", taskData.title);
-      formData.append("user_name", taskData.user_name);
-      formData.append("languages", taskData.languages);
-      formData.append("description", taskData.description);
-      formData.append("groups", taskData.groups);
-      formData.append("price", taskData.price);
-      if (taskData.file) formData.append("file", taskData.file);
-
-      const response = await fetch(
-        "http://localhost:8000/api/tasks/add-task-file",
-        {
-          method: "POST",
-          body: formData,
-        },
-      );
-      const data = await response.json();
-      console.log("Task added (file):", data);
-    } catch (error) {
-      console.error("Error adding task:", error);
-    }
+  const handleCancel = () => {
+    setEditingField(null);
+    setEditValue("");
   };
+
+  const renderRow = (label, field) => {
+    const value = user[field];
+    const isEditing = editingField === field;
+    const isArray = Array.isArray(value);
+    const isReadOnly = READ_ONLY_FIELDS.includes(field);
+
+    return (
+      <div className="account-row" key={field}>
+        <span className="account-label">{label}</span>
+        <div className="account-edit-wrapper">
+          {isEditing ? (
+            <>
+              <input
+                className="account-input"
+                value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+                placeholder={isArray ? "comma separated" : ""}
+                autoFocus
+              />
+              <button
+                className="account-save-btn"
+                onClick={() => handleSave(field)}
+              >
+                Save
+              </button>
+              <button className="account-cancel-btn" onClick={handleCancel}>
+                Cancel
+              </button>
+            </>
+          ) : (
+            <>
+              {isArray ? (
+                <div className="account-tag-container">
+                  {value.length === 0 ? (
+                    <span className="account-value">None</span>
+                  ) : (
+                    value.map((v) => (
+                      <span key={v} className="account-tag">
+                        {v}
+                      </span>
+                    ))
+                  )}
+                </div>
+              ) : field === "password" ? (
+                <span className="account-value">
+                  {"•".repeat(value.length)}
+                </span>
+              ) : field === "price" ? (
+                <span className="account-value">${value}</span>
+              ) : field === "rating" ? (
+                <span className="account-value">{value} / 5</span>
+              ) : (
+                <span className="account-value">{value}</span>
+              )}
+              {isReadOnly ? null : (
+                <button
+                  className="account-edit-btn"
+                  onClick={() => handleEdit(field, value)}
+                >
+                  Edit
+                </button>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  if (error)
+    return (
+      <div>
+        <Navbar />
+        <div className="account-error">{error}</div>
+      </div>
+    );
+  if (!user)
+    return (
+      <div>
+        <Navbar />
+        <div className="account-loading">Loading...</div>
+      </div>
+    );
 
   return (
     <div>
       <Navbar />
-      <div className="add-task-container">
-        <h1 className="add-task-title">Add Task</h1>
-
-        {/* Toggle */}
-        <div className="add-task-toggle">
-          <button
-            className={`add-task-toggle-btn ${mode === "manual" ? "active" : ""}`}
-            onClick={() => setMode("manual")}
-          >
-            Manual
-          </button>
-          <button
-            className={`add-task-toggle-btn ${mode === "file" ? "active" : ""}`}
-            onClick={() => setMode("file")}
-          >
-            Upload File
-          </button>
-        </div>
-
-        <div className="add-task-card">
-          <div className="add-task-field">
-            <label className="add-task-label">Title *</label>
-            <input
-              className="add-task-input"
-              type="text"
-              name="title"
-              value={taskData.title}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="add-task-field">
-            <label className="add-task-label">User Name *</label>
-            <input
-              className="add-task-input"
-              type="text"
-              name="user_name"
-              value={taskData.user_name}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="add-task-field">
-            <label className="add-task-label">Languages</label>
-            <input
-              className="add-task-input"
-              type="text"
-              name="languages"
-              value={taskData.languages}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="add-task-field">
-            <label className="add-task-label">Description</label>
-            <textarea
-              className="add-task-textarea"
-              name="description"
-              value={taskData.description}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="add-task-field">
-            <label className="add-task-label">Groups</label>
-            <input
-              className="add-task-input"
-              type="text"
-              name="groups"
-              value={taskData.groups}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="add-task-field">
-            <label className="add-task-label">Price *</label>
-            <input
-              className="add-task-input"
-              type="number"
-              name="price"
-              value={taskData.price}
-              onChange={(e) =>
-                setTaskData({ ...taskData, price: parseInt(e.target.value) })
-              }
-            />
-          </div>
-
-          {/* Champ qui change selon le mode */}
-          {mode === "manual" ? (
-            <div className="add-task-field">
-              <label className="add-task-label">Code *</label>
-              <textarea
-                className="add-task-textarea"
-                name="code"
-                value={taskData.code}
-                onChange={handleChange}
-              />
-            </div>
-          ) : (
-            <div className="add-task-field">
-              <label className="add-task-label">File *</label>
-              <input
-                className="add-task-input"
-                type="file"
-                onChange={(e) =>
-                  setTaskData({ ...taskData, file: e.target.files[0] || null })
-                }
-              />
-            </div>
-          )}
-
-          <button
-            className="add-task-btn"
-            type="button"
-            onClick={mode === "manual" ? addTaskManual : addTaskFile}
-          >
-            Add Task
-          </button>
+      <div className="account-container">
+        <h1 className="account-title">Account Information</h1>
+        <div className="account-card">
+          {renderRow("Name", "name")}
+          {renderRow("Password", "password")}
+          {renderRow("Credits", "credits")}
+          {renderRow("Price", "price")}
+          {renderRow("Rating", "rating")}
+          {renderRow("Groups", "groups")}
+          {renderRow("Code Languages", "code_languages")}
+          {renderRow("List of Codes", "list_of_codes")}
         </div>
       </div>
     </div>
   );
 }
-
-export default AddTaskPage;
