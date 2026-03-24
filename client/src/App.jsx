@@ -1,21 +1,25 @@
-
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import { useAuth } from '@clerk/clerk-react'
-import Navbar from './components/Navbar'
-import ProtectedRoute from './components/ProtectedRoute'
-import SignInPage from './pages/SignInPage'
-import SignUpPage from './pages/SignUpPage'
-import HomePage from './pages/HomePage'
-import AllTasksPage from './pages/AllTasksPage'
-import MyTasksPage from './pages/MyTasksPage'
-import AddTaskPage from './pages/AddTaskPage'
-import TaskDetailsPage from './pages/TaskDetailsPage'
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { useAuth } from "@clerk/clerk-react";
+import Navbar from "./components/Navbar";
+import ProtectedRoute from "./components/ProtectedRoute";
+import SignInPage from "./pages/SignInPage";
+import SignUpPage from "./pages/SignUpPage";
+import HomePage from "./pages/HomePage";
+import AllTasksPage from "./pages/AllTasksPage";
+import MyTasksPage from "./pages/MyTasksPage";
+import AddTaskPage from "./pages/AddTaskPage";
+import TaskDetailsPage from "./pages/TaskDetailsPage";
 
 function App() {
-  const { isLoaded, isSignedIn } = useAuth()
+  const { isLoaded, isSignedIn } = useAuth();
 
   if (!isLoaded) {
-    return <div style={{ padding: '20px' }}>Loading...</div>
+    return <div style={{ padding: "20px" }}>Loading...</div>;
   }
 
   return (
@@ -68,11 +72,11 @@ function App() {
 
         <Route
           path="*"
-          element={<Navigate to={isSignedIn ? '/' : '/sign-in'} replace />}
+          element={<Navigate to={isSignedIn ? "/" : "/sign-in"} replace />}
         />
       </Routes>
     </Router>
-  )
+  );
 }
 
-export default App
+export default App;
