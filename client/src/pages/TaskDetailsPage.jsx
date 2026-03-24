@@ -1,5 +1,6 @@
 import React from "react";
 import { useParams } from "react-router-dom";
+import Navbar from "../components/Navbar";
 
 function TaskDetailsPage() {
   const { id } = useParams();
@@ -9,7 +10,7 @@ function TaskDetailsPage() {
     const fetchTaskDetails = async () => {
       try {
         // endpoint 6 : "/api/tasks/:id"
-        const response = await fetch(`/api/tasks/${id}`);
+        const response = await fetch(`http://localhost:8000/api/tasks/${id}`);
         const data = await response.json();
         setTask(data);
       } catch (error) {
@@ -22,6 +23,7 @@ function TaskDetailsPage() {
 
   return (
     <div>
+      <Navbar />
       {task ? (
         <div>
           <h1>{task.title}</h1>
