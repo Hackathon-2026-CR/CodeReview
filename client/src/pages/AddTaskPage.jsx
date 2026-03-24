@@ -1,11 +1,10 @@
 import { useState } from "react";
 import "../styles/AddTaskPage.css";
 import Navbar from "../components/Navbar";
-import { useNavigate } from "react-router-dom";
 
 export default function AddTaskPage() {
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [mode, setMode] = useState("file");
   const [fileKey, setFileKey] = useState(0);
 
@@ -62,42 +61,27 @@ export default function AddTaskPage() {
     }
 
     setLoading(true);
+    setSuccess(false);
 
     try {
-      let response;
+      const formData = new FormData();
+      formData.append("title", taskData.title);
+      formData.append("user_name", taskData.user_name);
+      formData.append("languages", taskData.languages);
+      formData.append("description", taskData.description);
+      formData.append("groups", taskData.groups);
+      formData.append("price", taskData.price);
 
       if (mode === "file") {
-        const formData = new FormData();
-        formData.append("title", taskData.title);
-        formData.append("user_name", taskData.user_name);
-        formData.append("languages", taskData.languages);
-        formData.append("description", taskData.description);
-        formData.append("groups", taskData.groups);
-        formData.append("price", taskData.price);
         formData.append("file", taskData.file);
-
-        response = await fetch(
-          "http://localhost:8000/api/tasks/add-task-file",
-          {
-            method: "POST",
-            body: formData,
-          },
-        );
       } else {
-        response = await fetch("http://localhost:8000/api/tasks/add-task", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            title: taskData.title,
-            user_name: taskData.user_name,
-            languages: taskData.languages,
-            description: taskData.description,
-            groups: taskData.groups,
-            price: taskData.price,
-            code: taskData.code,
-          }),
-        });
+        formData.append("code", taskData.code);
       }
+
+      const response = await fetch("http://localhost:8000/api/tasks/add-task-with-file", {
+        method: "POST",
+        body: formData,
+      });
 
       if (response.status === 400) {
         alert("Invalid data. Please check your inputs.");
@@ -113,7 +97,8 @@ export default function AddTaskPage() {
       }
 
       resetForm();
-      navigate("/all-tasks");
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 2000);
     } catch (err) {
       alert("Network error. Check your internet connection.");
     } finally {
@@ -196,8 +181,8 @@ export default function AddTaskPage() {
               value={mode}
               onChange={(e) => setMode(e.target.value)}
             >
-              <option value="manual">Manual Code</option>
               <option value="file">Upload File</option>
+              <option value="manual">Manual Code</option>
             </select>
           </div>
 
@@ -229,13 +214,19 @@ export default function AddTaskPage() {
             </div>
           )}
 
-          <button
-            className="add-task-btn"
-            onClick={handleSubmit}
-            disabled={loading}
-          >
-            {loading ? "Adding..." : "Add Task"}
-          </button>
+          <div className="add-task-bottom">
+            <button
+              className="add-task-btn"
+              onClick={handleSubmit}
+              disabled={loading}
+            >
+              {loading ? "Adding..." : "Add Task"}
+            </button>
+
+            {success && (
+              <div className="add-task-success">Task added successfully!</div>
+            )}
+          </div>
         </div>
       </div>
     </div>
