@@ -4,70 +4,11 @@
   padding: 0 1rem;
 }
 
-.add-task-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1.5rem;
-}
-
 .add-task-title {
   font-size: 1.6rem;
   font-weight: bold;
   color: #a78bfa;
-  margin-bottom: 0;
-}
-
-
-.add-task-mode-select {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  min-height: calc(100vh - 60px);
-}
-
-.add-task-mode-title {
-  font-size: 1.6rem;
-  font-weight: bold;
-  color: #a78bfa;
-  margin-bottom: 1rem;
-  text-align: center;
-}
-
-.add-task-mode-btn {
-  width: 100%;
-  max-width: 400px;
-  padding: 2rem 1rem;
-  border-radius: 14px;
-  border: 1px solid #a78bfa44;
-  background-color: #1e1e2e;
-  color: #cdd6f4;
-  font-size: 1rem;
-  cursor: pointer;
-  transition:
-    background 0.2s,
-    border 0.2s,
-    color 0.2s;
-}
-
-.add-task-mode-btn:hover {
-  background-color: #a78bfa22;
-  border-color: #a78bfa;
-  color: #a78bfa;
-}
-
-.add-task-back-btn {
-  background: transparent;
-  border: none;
-  color: #a78bfa;
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-
-.add-task-back-btn:hover {
-  text-decoration: underline;
+  margin-bottom: 1.5rem;
 }
 
 .add-task-card {
@@ -115,6 +56,11 @@
   min-height: 120px;
 }
 
+.add-task-input option {
+  background-color: #2a2a3e;
+  color: #cdd6f4;
+}
+
 .add-task-input[type="file"] {
   padding: 6px 12px;
   cursor: pointer;
@@ -131,6 +77,31 @@
   font-size: 0.85rem;
   font-weight: bold;
   margin-right: 10px;
+  transition: background 0.2s;
+}
+
+.add-task-input[type="file"]::-webkit-file-upload-button:hover {
+  background-color: #c4b5fd;
+}
+
+.add-task-input[type="number"]::-webkit-inner-spin-button,
+.add-task-input[type="number"]::-webkit-outer-spin-button {
+  opacity: 1;
+  filter: invert(1);
+}
+
+.add-task-file-name {
+  color: #888;
+  font-size: 0.85rem;
+  margin-top: 2px;
+}
+
+.add-task-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
 }
 
 .add-task-btn {
@@ -142,10 +113,38 @@
   cursor: pointer;
   font-size: 0.95rem;
   font-weight: bold;
-  align-self: flex-end;
-  transition: background 0.2s;
+  transition:
+    background 0.2s,
+    opacity 0.2s;
 }
 
 .add-task-btn:hover {
   background-color: #c4b5fd;
+}
+
+.add-task-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.add-task-success {
+  background-color: #a6e3a122;
+  border: 1px solid #a6e3a1;
+  color: #a6e3a1;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  animation: fadeOut 2s forwards;
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }

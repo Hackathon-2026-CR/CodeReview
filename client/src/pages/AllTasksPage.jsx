@@ -1,9 +1,12 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/Navbar";
+import "../styles/AllTasksPage.css";
 
 function AllTasksPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [tasks, setTasks] = React.useState([]);
 
   React.useEffect(() => {
@@ -11,7 +14,7 @@ function AllTasksPage() {
       try {
         const username = localStorage.getItem("username");
         const response = await fetch(
-          `http://localhost:8000/api/tasks/all-tasks/${username}`,
+          `https://nonpositivistic-unmesmerised-sharyn.ngrok-free.dev/api/tasks/all-tasks/${username}`,
         );
         const data = await response.json();
         setTasks(data);
@@ -21,24 +24,30 @@ function AllTasksPage() {
     };
 
     fetchTasks();
-  }, []);
+  }, [user?.username]);
 
   return (
     <div>
       <Navbar />
-      <h1>All Tasks Available:</h1>
+      <div className="all-tasks-container">
+        <h1 className="all-tasks-title">All Tasks Available:</h1>
 
-      <ul>
-        {tasks.map((task) => (
-          <li key={task.id}>
-            <h3>{task.title}</h3>
-            <p>{task.description}</p>
-            <button onClick={() => navigate(`/task-details/${task.id}`)}>
-              View Task
-            </button>
-          </li>
-        ))}
-      </ul>
+        {tasks.length === 0 ? (
+          <p className="all-tasks-empty">No tasks available yet.</p>
+        ) : (
+          <ul className="all-tasks-list">
+            {tasks.map((task) => (
+              <li key={task.id} className="all-tasks-item">
+                <h3>{task.title}</h3>
+                <p>{task.description}</p>
+                <button onClick={() => navigate(`/task-details/${task.id}`)}>
+                  View Task
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }
