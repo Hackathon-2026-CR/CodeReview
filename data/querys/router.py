@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from data.querys import dal
-from data.querys.moduls import AddTask, UserCreate, UserUpdate, LoginSchema, SuccessResponse, ErrorResponse, UserSchema
+from data.querys.moduls import AddTask, UserCreate, UserUpdate, LoginSchema, SuccessResponse, ErrorResponse
+
 
 router = APIRouter(
     prefix="/api/tasks",
@@ -67,7 +68,7 @@ def login(credentials: LoginSchema):
 
     return {
             "ok": True,
-            "data": {
+            "user": {
                 "id": user_data['id'],
                 "username": user_data['name']
             }

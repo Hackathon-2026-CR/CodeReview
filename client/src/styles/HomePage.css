@@ -1,0 +1,39 @@
+/* ── Page ── */
+.home-page {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.home-page h1 {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #a78bfa;
+  margin: 0;
+}
+
+/* ── User card ── */
+.home-user-card {
+  background-color: #1e1e2e;
+  border: 1px solid #a78bfa44;
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.home-user-card p {
+  color: #cdd6f4;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.home-user-card span {
+  color: #a78bfa;
+  font-weight: 600;
+}

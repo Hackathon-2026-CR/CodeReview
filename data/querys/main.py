@@ -5,7 +5,6 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI(title='CodeReview')
 
 
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # React dev server
