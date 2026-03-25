@@ -30,11 +30,14 @@ export function AuthProvider({ children }) {
 
   const login = async (username, password) => {
     try {
-      const response = await fetch('http://localhost:3001/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-      })
+      const response = await fetch(
+        "https://nonpositivistic-unmesmerised-sharyn.ngrok-free.dev/api/tasks/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
+        },
+      );
 
       if (!response.ok) {
         const errorData = await response.json()
@@ -58,6 +61,39 @@ export function AuthProvider({ children }) {
     }
   }
 
+  const register = async (username, password, email) => {
+    try {
+      const response = await fetch(
+        "https://nonpositivistic-unmesmerised-sharyn.ngrok-free.dev/api/tasks/add-user",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
+        },
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Registration failed')
+      }
+
+      const data = await response.json()
+
+      setToken(data.token)
+      setUser(data.user)
+
+      // Persist to localStorage
+      localStorage.setItem('auth_token', data.token)
+      localStorage.setItem('auth_user', JSON.stringify(data.user))
+
+      // Redirect to home
+      navigate('/')
+    } catch (error) {
+      console.error('Registration error:', error)
+      throw error
+    }
+  }
+
   const logout = () => {
     setToken(null)
     setUser(null)
@@ -67,7 +103,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, token, loading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   )
