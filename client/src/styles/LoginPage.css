@@ -1,143 +1,179 @@
+/* ── Page ── */
 .login-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #181825;
+  padding: 1rem;
 }
 
+/* ── Card ── */
 .login-box {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-  padding: 40px;
+  background-color: #1e1e2e;
+  border-radius: 14px;
+  padding: 2rem 2.5rem;
   width: 100%;
-  max-width: 400px;
+  max-width: 420px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .login-box h1 {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #a78bfa;
   text-align: center;
-  margin-bottom: 30px;
-  color: #333;
-  font-size: 28px;
+  margin: 0;
+}
+
+/* ── Form ── */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
 }
 
 .form-group {
-  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .form-group label {
-  display: block;
-  margin-bottom: 8px;
-  color: #333;
+  color: #888;
+  font-size: 0.9rem;
   font-weight: 500;
-  font-size: 14px;
 }
 
+/* ── Tous les inputs sombres (y compris autofill) ── */
 .form-group input {
-  width: 100%;
+  background-color: #2a2a3e;
+  border: 1px solid #a78bfa44;
+  border-radius: 8px;
+  color: #cdd6f4;
   padding: 10px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
-  transition: border-color 0.3s;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border 0.2s;
+  font-family: inherit;
+  width: 100%;
+  box-sizing: border-box;
+  -webkit-text-fill-color: #cdd6f4;
 }
 
 .form-group input:focus {
-  outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #a78bfa;
+  background-color: #2a2a3e;
 }
 
 .form-group input:disabled {
-  background-color: #f5f5f5;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
-.error-message {
-  color: #d32f2f;
-  font-size: 14px;
-  margin-bottom: 15px;
-  padding: 10px;
-  background-color: #ffebee;
-  border-radius: 4px;
-  border-left: 4px solid #d32f2f;
+/* Fix autofill Chrome qui force le fond blanc */
+.form-group input:-webkit-autofill,
+.form-group input:-webkit-autofill:hover,
+.form-group input:-webkit-autofill:focus,
+.form-group input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0px 1000px #2a2a3e inset !important;
+  -webkit-text-fill-color: #cdd6f4 !important;
+  caret-color: #cdd6f4;
+  border: 1px solid #a78bfa44;
+  transition: background-color 5000s ease-in-out 0s;
 }
 
-button {
-  width: 100%;
-  padding: 12px;
-  background: #667eea;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  margin-bottom: 20px;
-}
-
-button:hover:not(:disabled) {
-  background-color: #5568d354;
-}
-
-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
-
-.auth-link {
-  text-align: center;
-  margin-top: 20px;
-}
-
-.auth-link p {
-  margin: 0;
-  font-size: 14px;
-  color: #555;
-}
-
-.auth-link a {
-  color: #667eea;
-  text-decoration: none;
-  font-weight: 600;
-  transition: color 0.3s;
-}
-
-.auth-link a:hover {
-  color: #5568d3;
-}
-
+/* ── Password wrapper ── */
 .password-input-wrapper {
   position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .password-input-wrapper input {
-  width: 100%;
-  padding-right: 35px;
+  padding-right: 42px;
 }
 
 .password-toggle {
   position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
+  right: 10px;
   background: none;
   border: none;
+  color: #888;
   cursor: pointer;
-  font-size: 16px;
-  padding: 4px;
-  color: #667eea;
+  font-size: 1.2rem;
+  padding: 0;
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  pointer-events: auto;
+  transition: color 0.2s;
+}
+
+.password-toggle:hover {
+  color: #a78bfa;
 }
 
 .password-toggle:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Error ── */
+.error-message {
+  background-color: #f38ba822;
+  border: 1px solid #f38ba8;
+  color: #f38ba8;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* ── Submit button ── */
+form button[type="submit"] {
+  background-color: #a78bfa;
+  border: none;
+  color: #1e1e2e;
+  padding: 11px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: bold;
+  transition:
+    background 0.2s,
+    opacity 0.2s;
+  width: 100%;
+}
+
+form button[type="submit"]:hover {
+  background-color: #c4b5fd;
+}
+
+form button[type="submit"]:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* ── Auth link ── */
+.auth-link {
+  text-align: center;
+}
+
+.auth-link p {
+  color: #888;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.auth-link a {
+  color: #a78bfa;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.auth-link a:hover {
+  color: #c4b5fd;
 }

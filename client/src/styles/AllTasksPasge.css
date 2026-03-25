@@ -1,0 +1,80 @@
+/* ── Page ── */
+.all-tasks-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.all-tasks-title {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #a78bfa;
+  margin-bottom: 1.5rem;
+}
+
+/* ── List ── */
+.all-tasks-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ── Task card ── */
+.all-tasks-item {
+  background-color: #1e1e2e;
+  border: 1px solid #a78bfa44;
+  border-radius: 14px;
+  padding: 1.2rem 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: border 0.2s;
+}
+
+.all-tasks-item:hover {
+  border-color: #a78bfa;
+}
+
+.all-tasks-item h3 {
+  color: #cdd6f4;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.all-tasks-item p {
+  color: #888;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* ── View button ── */
+.all-tasks-item button {
+  align-self: flex-end;
+  background-color: #a78bfa;
+  border: none;
+  color: #1e1e2e;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: bold;
+  transition: background 0.2s;
+  margin-top: 0.5rem;
+}
+
+.all-tasks-item button:hover {
+  background-color: #c4b5fd;
+}
+
+/* ── Empty state ── */
+.all-tasks-empty {
+  color: #555;
+  font-size: 0.95rem;
+  font-style: italic;
+  text-align: center;
+  margin-top: 3rem;
+}

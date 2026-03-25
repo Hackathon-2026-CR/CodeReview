@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/Navbar";
+import "../styles/MyTasksPage.css";
 
 function MyTasksPage() {
   const [myTasks, setMyTasks] = React.useState([]);
