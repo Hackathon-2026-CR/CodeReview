@@ -38,16 +38,16 @@ def get_task_using_id(id):
     return dal.get_full_task_by_id(id)
 
 
-@router.post('/add-task-with-file')
+@router.post('/add-task')
 async def add_task_with_file(task: AddTask = Depends()):
     return dal.add_task_manually(task)
 
 
 @router.post('/add-user')
-async def add_user(user: UserCreate):
+async def add_user(user: UserCreate = Depends()):
     return dal.add_to_users(user)
 
 
 @router.post('/update-user')
-async def update_user(user: UserUpdate):
+async def update_user(user: UserUpdate = Depends()):
     return dal.update_user_profile(user)

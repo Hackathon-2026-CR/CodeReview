@@ -120,33 +120,37 @@ def finished(reviwer_name):  # 4
 
 def get_available_by_user(username):  # 5
     try:
-        user = """
-        SELECT groups FROM users
-        WHERE user = %s
+        user_query = """
+        SELECT `groups` FROM users
+        WHERE `name` = %s
         """
-        cursor.execute(user, [username])
-        groups = cursor.fetchone()
-
-        query = """
+        cursor.execute(user_query, (username,))
+        result = cursor.fetchone()
+        
+        if not result:
+            print(f"No user found: {username}")
+            return []
+        
+        user_groups = json.loads(result[0])  
+        
+        groups_json = json.dumps(user_groups)  
+        
+        task_query = """
         SELECT t.* 
         FROM tasks t
-        JOIN users u ON u.name = %s
-        WHERE JSON_OVERLAPS(t.groups, u.`groups`) 
-           OR JSON_CONTAINS(t.groups, '"public"');
+        WHERE JSON_OVERLAPS(t.groups, %s)
+           OR JSON_CONTAINS(t.groups, '"public"')
         """
-        cursor.execute(query, groups)
+        cursor.execute(task_query, (groups_json,))
         answer = cursor.fetchall()
-        response = []
-        if answer:
-            for row in answer:
-                response.append(row)
-            return cursor_to_dict(response)
-
-        else:
-            print(f"No codes found for reviewer: {username}")
-
+        
+        response = [cursor_to_dict([row])[0] for row in answer] if answer else []
+        return response
+        
     except mysql.connector.Error as err:
         return f"Database error: {err}"
+    except json.JSONDecodeError as err:
+        return f"JSON parse error: {err}"
 
 
 def get_full_task_by_id(id):  # 6
@@ -263,7 +267,9 @@ def update_user_profile(userupdate):
             params["price"] = userupdate.price
         if userupdate.languages is not None:
             updates.append("languages = %(languages)s")
-            params["languages"] = json.dumps(userupdate.languages)
+        if userupdate.credits is not None:
+            updates.append("credits = %(credits)s")
+            params["credits"] = userupdate.credits
 
         if not updates:
             return {"response": "No fields to update"}
