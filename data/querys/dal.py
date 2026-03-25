@@ -1,11 +1,9 @@
-from hacaton.utils.connection import get_connection
-from querys.moduls import TaskCreate
+from data.hacaton.utils.connection import get_connection
 import mysql.connector
 import json
-from fastapi import APIRouter, Form, File, UploadFile
 
+connection, cursor = get_connection()
 
-connection, cursor =  get_connection()
 
 def cursor_to_dict(data):
     if data is None:
@@ -18,7 +16,7 @@ def cursor_to_dict(data):
         rating = row_dict.get("rating")
         if rating:
             row_dict["rating"] = float(rating)
-        
+
         return row_dict
 
     # if data is list of rows
@@ -28,11 +26,13 @@ def cursor_to_dict(data):
 
         rating = row_dict.get("rating")
         if rating:
-            row_dict["rating"] = float(rating) # make it float and not decimal
+            row_dict["rating"] = float(rating)  # make it float and not decimal
+
 
         response.append(row_dict)
 
     return response
+
 
 def get_user(username):  # 1
     try:
@@ -48,11 +48,9 @@ def get_user(username):  # 1
     except mysql.connector.Error as err:
         print(f"Database error: {err}")
         return {"response": "this username don't exist"}
-    
 
 
-def published_codes(username): # 2
-
+def published_codes(username):  # 2
     try:
         query = """
         SELECT * FROM tasks
@@ -74,7 +72,7 @@ def published_codes(username): # 2
         print(f"Database error: {err}")
 
 
-def working_on(reviwer_name): # 3
+def working_on(reviwer_name):  # 3
 
     try:
         query = """
@@ -88,7 +86,7 @@ def working_on(reviwer_name): # 3
         if answer:
             for row in answer:
                 response.append(row)
-            return cursor_to_dict(response) 
+            return cursor_to_dict(response)
         else:
             print(f"No codes found for reviewer: {reviwer_name}")
 
@@ -96,8 +94,7 @@ def working_on(reviwer_name): # 3
         print(f"Database error: {err}")
 
 
-def finished(reviwer_name): # 4
-
+def finished(reviwer_name):  # 4
     try:
         query = """
         SELECT * FROM tasks
@@ -163,47 +160,9 @@ def get_full_task_by_id(id): # 6
     except mysql.connector.Error as err:
         print(f"Database error: {err}")
 
-# 7
-# def add_task_upload_file(
-#     title: str, user_name: str, languages: str,
-#     description: str | None, groups: str, price: int, file: UploadFile
-# ):
-#     try:
-#         code = file.file.read().decode('utf-8')
-#         code = json.loads(code)
-#         task_dict = {
-#             "title": title,
-#             "user_name": user_name,
-#             "languages": json.dumps(languages.split(",")),
-#             "description": description,
-#             "groups": json.dumps(groups.split(",")),
-#             "price": price,
-#             "code": code
-#         }
-#
-#         insert_query = """
-#         INSERT INTO tasks (title, user_name, languages, description, `groups`, price, code)
-#         VALUES (%(title)s, %(user_name)s, %(languages)s, %(description)s, %(groups)s, %(price)s, %(code)s)
-#         """
-#
-#         cursor.execute(insert_query, task_dict)
-#         connection.commit()
-#
-#         return {
-#             "response": f"task '{task_dict['title']}' added"
-#         }
-#     except Exception as err:
-#         return {"error from dal": str(err)}
-#
 
 # 8
 def add_task_manually(task_data):  # מקבל אובייקט מסוג AddTask
-    connection_result = get_connection()
-    if isinstance(connection_result, tuple):
-        connection = connection_result[0]
-    else:
-        connection = connection_result
-    cursor = connection.cursor(dictionary=True)  # dictionary=True עוזר לעבוד עם שמות עמודות
 
     try:
         # הכנת הנתונים למסד הנתונים
@@ -234,6 +193,54 @@ def add_task_manually(task_data):  # מקבל אובייקט מסוג AddTask
         return {"status": "error", "message": str(err)}
 
 
-# python -m querys.dal 
+def add_to_users(usercreate):
+    try:
+        insert_query = """
+        INSERT INTO users (name, password, email)
+        VALUES (%(name)s, %(password)s, %(email)s)
+        """ 
+
+        user_data = {
+            "name": usercreate.name,
+            "password": usercreate.password,
+            "email": usercreate.email
+        }
+
+        cursor.execute(insert_query, user_data)
+        connection.commit()
+        return {"response": f"user '{usercreate.name}' added (credits=200, groups=[], etc.)"}
+
+    except mysql.connector.Error as err:
+        print(f"Database error: {err}")
+        return {"error": f"Database error: {err}"}
 
 
+def update_user_profile(userupdate):
+    try:
+        updates = []
+        params = {"name": userupdate.name}
+
+        if userupdate.groups is not None:
+            updates.append("`groups` = %(groups)s")
+            params["groups"] = json.dumps(userupdate.groups)
+        if userupdate.price is not None:
+            updates.append("price = %(price)s")
+            params["price"] = userupdate.price
+        if userupdate.languages is not None:
+            updates.append("languages = %(languages)s")
+        if userupdate.credits is not None:
+            updates.append("credits = %(credits)s")
+            params["credits"] = userupdate.credits
+
+        if not updates:
+            return {"response": "No fields to update"}
+
+        query = f"UPDATE users SET {', '.join(updates)} WHERE name = %(name)s"
+        cursor.execute(query, params)
+        connection.commit()
+
+        return {"response": f"Updated {cursor.rowcount} profile"} if cursor.rowcount else {
+            "error": f"User '{userupdate.name}' not found"}
+
+    except mysql.connector.Error as err:
+        return {"error": str(err)}

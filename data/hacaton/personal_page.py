@@ -36,7 +36,7 @@ def published_codes(name):
 # -------------------------------------------------------------------------------
 # actions on the db
 
-def assign_reviewer(code_title, reviewer):
+def assign_reviewer(id, reviewer):
     """
     Updates a code request to assign a reviewer and change its status to 'review in process'.
     """
@@ -46,19 +46,19 @@ def assign_reviewer(code_title, reviewer):
             update_query = """
             UPDATE codes 
             SET reviewer = %s, status = 'review in process'
+            WHERE id = %s
             WHERE title = %s
             """
             
             reviewer_name = reviewer['name']
             
-            cursor.execute(update_query, (reviewer_name, code_title))
-            
+            cursor.execute(update_query, (reviewer_name, id))
             connection.commit()
             
             if cursor.rowcount > 0:
-                print(f"Success: '{code_title}' is now being reviewed by {reviewer_name}.")
+                print(f"Success: code '{id}' is now being reviewed by {reviewer_name}.")
             else:
-                print(f"Warning: No code found with the title '{code_title}'.")
+                print(f"Warning: No code found with the title '{id}'.")
                 
         except mysql.connector.Error as err:
             print(f"Database error: {err}")
