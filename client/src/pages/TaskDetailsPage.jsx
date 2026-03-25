@@ -1,6 +1,7 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import "../styles/TaskDetailsPage.css";
 
 function TaskDetailsPage() {
   const { id } = useParams();
@@ -9,7 +10,6 @@ function TaskDetailsPage() {
   React.useEffect(() => {
     const fetchTaskDetails = async () => {
       try {
-        // endpoint 6 : "/api/tasks/:id"
         const response = await fetch(
           `https://nonpositivistic-unmesmerised-sharyn.ngrok-free.dev/api/tasks/${id}`,
         );
@@ -27,12 +27,28 @@ function TaskDetailsPage() {
     <div>
       <Navbar />
       {task ? (
-        <div>
-          <h1>{task.title}</h1>
-          <p>{task.description}</p>
+        <div className="task-details-container">
+          <div className="task-details-card">
+            <h1>{task.title}</h1>
+            <hr className="task-details-divider" />
+
+            <div className="task-details-meta">
+              {task.languages && (
+                <span className="task-details-badge">🖥️ {task.languages}</span>
+              )}
+              {task.price && (
+                <span className="task-details-badge">💰 {task.price}</span>
+              )}
+              {task.groups && (
+                <span className="task-details-badge">👥 {task.groups}</span>
+              )}
+            </div>
+
+            <p>{task.description}</p>
+          </div>
         </div>
       ) : (
-        <p>Task not found</p>
+        <p className="task-not-found">Task not found</p>
       )}
     </div>
   );

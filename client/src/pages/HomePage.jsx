@@ -1,6 +1,7 @@
 import React from "react";
 import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/Navbar";
+import "../styles/HomePage.css";
 
 function HomePage() {
   const [user, setUser] = React.useState(null);
@@ -22,7 +23,6 @@ function HomePage() {
 
     fetchUser();
   }, [authUser?.username]);
-
   return (
     <div>
       <Navbar />
@@ -30,9 +30,13 @@ function HomePage() {
         <h1>Welcome to CodeReview app !</h1>
 
         {user && (
-          <div>
-            <p>Hello, {user.username}!</p>
-            <p>Email: {user.email}</p>
+          <div className="home-user-card">
+            <p>
+              Hello, <span>{user.username}</span>!
+            </p>
+            <p>
+              Email: <span>{user.email}</span>
+            </p>
           </div>
         )}
       </div>

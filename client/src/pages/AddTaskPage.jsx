@@ -166,16 +166,14 @@ export default function AddTaskPage() {
             />
           </div>
 
-          <div className="add-task-field">
-            <label className="add-task-label">Price *</label>
-            <input
-              type="number"
-              className="add-task-input"
-              name="price"
-              value={taskData.price}
-              onChange={handleChange}
-            />
-          </div>
+          <input
+            type="number"
+            className="add-task-input"
+            name="price"
+            value={taskData.price === 0 ? "" : taskData.price}
+            placeholder="e.g 12"
+            onChange={handleChange}
+          />
 
           <div className="add-task-field">
             <label className="add-task-label">Type *</label>

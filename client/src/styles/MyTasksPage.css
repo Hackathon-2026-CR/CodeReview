@@ -1,0 +1,86 @@
+/* ── Page ── */
+.my-tasks-page {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* ── Section titles ── */
+.my-tasks-page h1 {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #a78bfa;
+  margin: 0 0 1rem 0;
+}
+
+/* ── Cards ── */
+.my-tasks-page > div {
+  background-color: #1e1e2e;
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Lists ── */
+.my-tasks-page ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.my-tasks-page ul li {
+  background-color: #2a2a3e;
+  border: 1px solid #a78bfa44;
+  border-radius: 10px;
+  padding: 12px 16px;
+  color: #cdd6f4;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition:
+    border 0.2s,
+    background 0.2s;
+}
+
+.my-tasks-page ul li:hover {
+  border-color: #a78bfa;
+  background-color: #313145;
+}
+
+/* ── Empty state ── */
+.my-tasks-page ul:empty::after {
+  content: "No tasks found.";
+  color: #555;
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+/* ── Add Task button ── */
+.add-task {
+  display: flex;
+  justify-content: center;
+  background: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.add-task button {
+  background-color: #a78bfa;
+  border: none;
+  color: #1e1e2e;
+  padding: 11px 28px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+.add-task button:hover {
+  background-color: #c4b5fd;
+}
