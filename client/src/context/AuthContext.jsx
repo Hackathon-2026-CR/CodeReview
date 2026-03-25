@@ -61,14 +61,14 @@ export function AuthProvider({ children }) {
     }
   }
 
-  const register = async (username, password, email) => {
+  const register = async (name, password, email) => {
     try {
       const response = await fetch(
         "https://nonpositivistic-unmesmerised-sharyn.ngrok-free.dev/api/tasks/add-user",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, password }),
+          body: JSON.stringify({ name, password }),
         },
       );
 
