@@ -44,12 +44,12 @@ async def add_task_with_file(task: AddTask = Depends()):
 
 
 @router.post('/add-user')
-async def add_user(user: UserCreate = Depends()):
+async def add_user(user: UserCreate):
     return dal.add_to_users(user)
 
 
 @router.post('/update-user')
-async def update_user(user: UserUpdate = Depends()):
+async def update_user(user: UserUpdate):
     return dal.update_user_profile(user)
 
 
@@ -65,7 +65,6 @@ def login(credentials: LoginSchema):
             detail={"ok": False, "error": "Invalid credentials"}
         )
 
-    # החזרה של המבנה הכללי עם הנתונים הספציפיים
     return {
             "ok": True,
             "data": {
