@@ -11,10 +11,10 @@ export default function AddTaskPage() {
   const [taskData, setTaskData] = useState({
     title: "",
     user_name: localStorage.getItem("username") || "",
+    price: 0,
     languages: "",
     description: "",
     groups: "",
-    price: 0,
     code: "",
     file: null,
   });
@@ -78,10 +78,13 @@ export default function AddTaskPage() {
         formData.append("code", taskData.code);
       }
 
-      const response = await fetch("http://localhost:8000/api/tasks/add-task-with-file", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        "https://nonpositivistic-unmesmerised-sharyn.ngrok-free.dev/api/tasks/add-task-with-file",
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
 
       if (response.status === 400) {
         alert("Invalid data. Please check your inputs.");

@@ -20,7 +20,9 @@ export default function AccountPage() {
 
     const fetchUser = async () => {
       try {
-        const response = await fetch(`/api/users/${username}`);
+        const response = await fetch(
+          `https://nonpositivistic-unmesmerised-sharyn.ngrok-free.dev/api/tasks/users/${username}`,
+        );
         if (response.status === 404) {
           setError("This account does not exist.");
           return;
@@ -65,15 +67,18 @@ export default function AccountPage() {
       : editValue;
 
     try {
-      const response = await fetch("/api/user/update", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: localStorage.getItem("username"),
-          field,
-          value: newValue,
-        }),
-      });
+      const response = await fetch(
+        "https://nonpositivistic-unmesmerised-sharyn.ngrok-free.dev/api/tasks/update-user",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: localStorage.getItem("username"),
+            field,
+            value: newValue,
+          }),
+        },
+      );
 
       if (!response.ok) {
         alert("Failed to update. Please try again.");

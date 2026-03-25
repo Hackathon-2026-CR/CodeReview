@@ -11,9 +11,9 @@ function AllTasksPage() {
   React.useEffect(() => {
     const fetchTasks = async () => {
       try {
-        if (!user?.username) return;
+        const username = localStorage.getItem("username");
         const response = await fetch(
-          `http://localhost:8000/api/tasks/all-tasks/${user.username}`,
+          `https://nonpositivistic-unmesmerised-sharyn.ngrok-free.dev/api/tasks/all-tasks/${username}`,
         );
         const data = await response.json();
         setTasks(data);

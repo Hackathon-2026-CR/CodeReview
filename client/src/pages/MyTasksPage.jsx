@@ -12,10 +12,9 @@ function MyTasksPage() {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-
         if (!user?.username) return;
         const response = await fetch(
-          `http://localhost:8000/api/tasks/my-tasks/${user.username}`,
+          `https://nonpositivistic-unmesmerised-sharyn.ngrok-free.dev/api/tasks/my-tasks/${username}`,
         );
         const data = await response.json();
         setMyTasks(data);
@@ -32,7 +31,7 @@ function MyTasksPage() {
       try {
         if (!user?.username) return;
         const response = await fetch(
-          `http://localhost:8000/api/tasks/working-tasks/${user.username}`,
+          `https://nonpositivistic-unmesmerised-sharyn.ngrok-free.dev/api/tasks/working-tasks/${username}`,
         );
         const data = await response.json();
         setWorkingTasks(data);

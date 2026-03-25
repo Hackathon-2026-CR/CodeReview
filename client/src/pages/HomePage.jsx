@@ -11,7 +11,7 @@ function HomePage() {
       try {
         if (!authUser?.username) return;
         const response = await fetch(
-          `http://localhost:8000/api/users/${authUser.username}`,
+          `https://nonpositivistic-unmesmerised-sharyn.ngrok-free.dev/api/tasks/users/${username}`,
         );
         const data = await response.json();
         setUser(data);
