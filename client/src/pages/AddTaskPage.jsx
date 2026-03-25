@@ -79,7 +79,7 @@ export default function AddTaskPage() {
       }
 
       const response = await fetch(
-        "https://nonpositivistic-unmesmerised-sharyn.ngrok-free.dev/api/tasks/add-task-with-file",
+        "https://nonpositivistic-unmesmerised-sharyn.ngrok-free.dev/api/tasks/add-task",
         {
           method: "POST",
           body: formData,
