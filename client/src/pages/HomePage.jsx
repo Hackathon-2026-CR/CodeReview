@@ -1,15 +1,15 @@
 import React from "react";
+import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/Navbar";
 
 function HomePage() {
   const [user, setUser] = React.useState(null);
+  const { user: authUser } = useAuth();
 
   React.useEffect(() => {
     const fetchUser = async () => {
       try {
-        const username = localStorage.getItem("username");
-        if (!username) return;
-
+        if (!authUser?.username) return;
         const response = await fetch(
           `https://nonpositivistic-unmesmerised-sharyn.ngrok-free.dev/api/tasks/users/${username}`,
         );
@@ -21,7 +21,7 @@ function HomePage() {
     };
 
     fetchUser();
-  }, []);
+  }, [authUser?.username]);
 
   return (
     <div>

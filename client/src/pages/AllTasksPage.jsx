@@ -1,9 +1,11 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/Navbar";
 
 function AllTasksPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [tasks, setTasks] = React.useState([]);
 
   React.useEffect(() => {
@@ -19,7 +21,7 @@ function AllTasksPage() {
     };
 
     fetchTasks();
-  }, []);
+  }, [user?.username]);
 
   return (
     <div>

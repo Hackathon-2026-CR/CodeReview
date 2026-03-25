@@ -1,16 +1,19 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/Navbar";
 
 function MyTasksPage() {
   const [myTasks, setMyTasks] = React.useState([]);
   const [workingTasks, setWorkingTasks] = React.useState([]);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const username = localStorage.getItem("username");
+
+        if (!user?.username) return;
         const response = await fetch(
           `https://nonpositivistic-unmesmerised-sharyn.ngrok-free.dev/api/tasks/my-tasks/${username}`,
         );
@@ -22,12 +25,12 @@ function MyTasksPage() {
     };
 
     fetchTasks();
-  }, []);
+  }, [user?.username]);
 
   useEffect(() => {
     const fetchWorkingTasks = async () => {
       try {
-        const username = localStorage.getItem("username");
+        if (!user?.username) return;
         const response = await fetch(
           `https://nonpositivistic-unmesmerised-sharyn.ngrok-free.dev/api/tasks/working-tasks/${username}`,
         );
@@ -39,7 +42,7 @@ function MyTasksPage() {
     };
 
     fetchWorkingTasks();
-  }, []);
+  }, [user?.username]);
 
   return (
     <div>

@@ -1,23 +1,22 @@
 import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import "../styles/Navbar.css";
+import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import "../styles/Navbar.css"
 
 const pages = [
   { name: "Home", path: "/" },
   { name: "All Tasks", path: "/all-tasks" },
   { name: "My Tasks", path: "/my-tasks" },
   { name: "Add Task", path: "/add-task" },
-  { name: "Task Details", path: "/task-details/:id" },
 ];
 
 export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
+    logout();
   };
 
   return (
