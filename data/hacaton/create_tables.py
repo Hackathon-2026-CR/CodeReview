@@ -118,3 +118,5 @@ if connection and cursor:
         close_connection(connection, cursor)
 else:
     print("No database connection")
+        print(f"✅ Success! {users_inserted} users, {tasks_inserted} tasks, + code column")
+

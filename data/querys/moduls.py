@@ -19,10 +19,11 @@ class UserCreate(BaseModel):
 
 class UserUpdate(BaseModel):
     name: str
-    groups: str | None = None
+    credits: int = 200
+    groups: list[str] = []
     price: int | None = None
-    languages: str | None = None
-    credits: int | None = None
+    languages: list[str] = []
+
 
 
 class AddTask:

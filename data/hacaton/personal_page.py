@@ -47,12 +47,12 @@ def assign_reviewer(id, reviewer):
             UPDATE codes 
             SET reviewer = %s, status = 'review in process'
             WHERE id = %s
+            WHERE title = %s
             """
             
             reviewer_name = reviewer['name']
             
             cursor.execute(update_query, (reviewer_name, id))
-            
             connection.commit()
             
             if cursor.rowcount > 0:
