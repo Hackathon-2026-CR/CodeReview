@@ -1,5 +1,6 @@
 import React from "react";
 import { useAuth } from "../context/AuthContext";
+import { api } from "../api";
 import Navbar from "../components/Navbar";
 import "../styles/HomePage.css";
 
@@ -10,10 +11,10 @@ function HomePage() {
   React.useEffect(() => {
     const fetchUser = async () => {
       try {
-        if (!authUser?.username) return;
-        const response = await fetch(
-          `https://nonpositivistic-unmesmerised-sharyn.ngrok-free.dev/api/tasks/users/${username}`,
-        );
+        const username = localStorage.getItem("username"); // ← fix variable manquante
+        if (!username) return;
+
+        const response = await api.get(`/api/tasks/users/${username}`);
         const data = await response.json();
         setUser(data);
       } catch (error) {
@@ -23,6 +24,7 @@ function HomePage() {
 
     fetchUser();
   }, [authUser?.username]);
+
   return (
     <div>
       <Navbar />
@@ -32,10 +34,17 @@ function HomePage() {
         {user && (
           <div className="home-user-card">
             <p>
-              Hello, <span>{user.username}</span>!
-            </p>
+              Hello, <span>{user.name}</span>!
+            </p>{" "}
+            {/* ← "name" pas "username" */}
             <p>
               Email: <span>{user.email}</span>
+            </p>
+            <p>
+              Credits: <span>{user.credits}</span>
+            </p>
+            <p>
+              Rating: <span>{user.rating} / 5</span>
             </p>
           </div>
         )}

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { api } from "../api";
 import "../styles/AddTaskPage.css";
 import Navbar from "../components/Navbar";
 
@@ -14,7 +15,7 @@ export default function AddTaskPage() {
     price: 0,
     languages: "",
     description: "",
-    groups: "",
+    groups: "public",
     code: "",
     file: null,
   });
@@ -36,7 +37,7 @@ export default function AddTaskPage() {
       user_name: localStorage.getItem("username") || "",
       languages: "",
       description: "",
-      groups: "",
+      groups: "public",
       price: 0,
       code: "",
       file: null,
@@ -78,13 +79,7 @@ export default function AddTaskPage() {
         formData.append("code", taskData.code);
       }
 
-      const response = await fetch(
-        "https://nonpositivistic-unmesmerised-sharyn.ngrok-free.dev/api/tasks/add-task",
-        {
-          method: "POST",
-          body: formData,
-        },
-      );
+      const response = await api.postForm("/api/tasks/add-task", formData);
 
       if (response.status === 400) {
         alert("Invalid data. Please check your inputs.");

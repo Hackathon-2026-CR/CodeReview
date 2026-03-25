@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { api } from "../api";
 import Navbar from "../components/Navbar";
 import "../styles/BuyCreditsPage.css";
 
@@ -22,21 +23,29 @@ export default function BuyCreditsPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  // ── Load current credits ──
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("auth_user") || "{}");
-    if (user?.credits !== undefined) setCredits(user.credits);
+    const fetchCredits = async () => {
+      const username = localStorage.getItem("username");
+      if (!username) return;
+      try {
+        const res = await api.get(`/api/tasks/users/${username}`);
+        const data = await res.json();
+        if (data?.credits !== undefined) setCredits(data.credits);
+      } catch {
+        console.error("Could not fetch credits");
+      }
+    };
+    fetchCredits();
   }, []);
 
-  // ── Purchase ──
   async function handlePurchase() {
     if (!selectedPack) {
       alert("Please select a credit pack first.");
       return;
     }
 
-    const user = JSON.parse(localStorage.getItem("auth_user") || "{}");
-    if (!user?.username) {
+    const username = localStorage.getItem("username");
+    if (!username) {
       alert("You are not logged in.");
       return;
     }
@@ -45,28 +54,22 @@ export default function BuyCreditsPage() {
     try {
       const newCredits = credits + selectedPack.credits;
 
-      const res = await fetch(
-        "https://nonpositivistic-unmesmerised-sharyn.ngrok-free.dev/api/tasks/update-user",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: user.username,
-            credits: newCredits,
-          }),
-        },
-      );
+      const res = await api.post("/api/tasks/update-user", {
+        name: username,
+        credits: newCredits,
+      });
 
       const data = await res.json();
-
       if (data.error) {
         alert(data.error);
         return;
       }
 
-      // Update localStorage
-      const updatedUser = { ...user, credits: newCredits };
-      localStorage.setItem("auth_user", JSON.stringify(updatedUser));
+      const storedUser = JSON.parse(localStorage.getItem("auth_user") || "{}");
+      localStorage.setItem(
+        "auth_user",
+        JSON.stringify({ ...storedUser, credits: newCredits }),
+      );
 
       setCredits(newCredits);
       setSuccess(true);

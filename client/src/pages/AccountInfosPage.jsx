@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { api } from "../api";
 import Navbar from "../components/Navbar";
 import "../styles/AccountInfosPage.css";
 
@@ -20,29 +21,14 @@ export default function AccountPage() {
 
     const fetchUser = async () => {
       try {
-        const response = await fetch(
-          `https://nonpositivistic-unmesmerised-sharyn.ngrok-free.dev/api/tasks/users/${username}`,
-        );
-        if (response.status === 404) {
-          setError("This account does not exist.");
-          return;
-        }
-        if (response.status === 401) {
-          setError("Your session has expired. Please log in again.");
-          return;
-        }
-        if (response.status === 403) {
-          setError("You do not have permission to view this account.");
-          return;
-        }
+        const response = await api.get(`/api/tasks/users/${username}`);
         if (!response.ok) {
           setError("Something went wrong. Please try again later.");
           return;
         }
-
         const data = await response.json();
         setUser(data);
-      } catch (err) {
+      } catch {
         setError("Network error. Check your internet connection.");
       }
     };
@@ -53,7 +39,9 @@ export default function AccountPage() {
   const handleEdit = (field, currentValue) => {
     setEditingField(field);
     setEditValue(
-      Array.isArray(currentValue) ? currentValue.join(", ") : currentValue,
+      Array.isArray(currentValue)
+        ? currentValue.join(", ")
+        : (currentValue ?? ""),
     );
   };
 
@@ -67,27 +55,21 @@ export default function AccountPage() {
       : editValue;
 
     try {
-      const response = await fetch(
-        "https://nonpositivistic-unmesmerised-sharyn.ngrok-free.dev/api/tasks/update-user",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            username: localStorage.getItem("username"),
-            field,
-            value: newValue,
-          }),
-        },
-      );
+      const response = await api.post("/api/tasks/update-user", {
+        name: localStorage.getItem("username"),
+        [field]: newValue,
+      });
 
-      if (!response.ok) {
-        alert("Failed to update. Please try again.");
+      const data = await response.json();
+
+      if (data.error) {
+        alert(data.error);
         return;
       }
 
       setUser((prev) => ({ ...prev, [field]: newValue }));
       setEditingField(null);
-    } catch (err) {
+    } catch {
       alert("Network error. Could not save changes.");
     }
   };
@@ -130,8 +112,8 @@ export default function AccountPage() {
             <>
               {isArray ? (
                 <div className="account-tag-container">
-                  {value.length === 0 ? (
-                    <span className="account-value">None</span>
+                  {!value || value.length === 0 ? (
+                    <span className="account-value account-empty">None</span>
                   ) : (
                     value.map((v) => (
                       <span key={v} className="account-tag">
@@ -142,16 +124,16 @@ export default function AccountPage() {
                 </div>
               ) : field === "password" ? (
                 <span className="account-value">
-                  {"•".repeat(value.length)}
+                  {"•".repeat(value?.length || 8)}
                 </span>
               ) : field === "price" ? (
-                <span className="account-value">${value}</span>
+                <span className="account-value">${value ?? "—"}</span>
               ) : field === "rating" ? (
-                <span className="account-value">{value} / 5</span>
+                <span className="account-value">{value ?? "—"} / 5</span>
               ) : (
-                <span className="account-value">{value}</span>
+                <span className="account-value">{value ?? "—"}</span>
               )}
-              {isReadOnly ? null : (
+              {!isReadOnly && (
                 <button
                   className="account-edit-btn"
                   onClick={() => handleEdit(field, value)}
@@ -173,6 +155,7 @@ export default function AccountPage() {
         <div className="account-error">{error}</div>
       </div>
     );
+
   if (!user)
     return (
       <div>
@@ -193,7 +176,7 @@ export default function AccountPage() {
           {renderRow("Price", "price")}
           {renderRow("Rating", "rating")}
           {renderRow("Groups", "groups")}
-          {renderRow("Code Languages", "code_languages")}
+          {renderRow("Code Languages", "languages")}
           {renderRow("List of Codes", "list_of_codes")}
         </div>
       </div>

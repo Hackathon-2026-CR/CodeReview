@@ -11,7 +11,6 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import AccountPage from "./pages/AccountInfosPage";
 import BuyCreditPage from "./pages/BuyCreditPage";
 
-
 function App() {
   return (
     <Routes>
@@ -71,6 +70,16 @@ function App() {
         }
       />
       <Route
+        path="/buy-credits"
+        element={
+          <ProtectedRoute>
+            <>
+              <BuyCreditPage />
+            </>
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/account"
         element={
           <ProtectedRoute>
@@ -78,11 +87,6 @@ function App() {
           </ProtectedRoute>
         }
       />
-
-      {/* Catch-all */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-
-      <Route path="/buy-credits" element={<BuyCreditPage />} />
 
       {/* Catch-all */}
       <Route path="*" element={<Navigate to="/" replace />} />
