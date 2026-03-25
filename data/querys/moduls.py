@@ -22,6 +22,7 @@ class UserUpdate(BaseModel):
     groups: str | None = None
     price: int | None = None
     languages: str | None = None
+    credits: int | None = None
 
 
 class AddTask:
