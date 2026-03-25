@@ -38,7 +38,7 @@ def get_task_using_id(id):
     return dal.get_full_task_by_id(id)
 
 
-@router.post('/add-task')
+@router.post('/add-task-with-file')
 async def add_task_with_file(task: AddTask = Depends()):
     return dal.add_task_manually(task)
 

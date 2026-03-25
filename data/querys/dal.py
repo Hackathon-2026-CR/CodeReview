@@ -140,7 +140,7 @@ def get_available_by_user(username):  # 5
         if answer:
             for row in answer:
                 response.append(row)
-            cursor_to_dict(response)
+            return cursor_to_dict(response)
 
         else:
             print(f"No codes found for reviewer: {username}")

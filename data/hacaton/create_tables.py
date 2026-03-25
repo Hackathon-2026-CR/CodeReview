@@ -68,31 +68,26 @@ if connection and cursor:
 
         # Insert tasks (add code=None)
         tasks_data = [
-    # 1-5: Jacob's tasks
     ('Python Aggregator', 'Jacob', json.dumps(['Python', 'SQL']), 'A script to scrape data.', json.dumps(['Meta', 'Google']), 'waiting for review', None, 45, None),
     ('Elasticsearch Pipeline', 'Jacob', json.dumps(['Python']), 'Log indexing pipeline.', json.dumps(['Amazon', 'Google']), 'review in process', 'Alice', 60, None),
     ('Kafka Producer', 'Jacob', json.dumps(['Python', 'Java']), 'Distributed message producer.', json.dumps(['Netflix']), 'reviewed', 'Bob', 50, None),
     ('MongoDB Queries', 'Jacob', json.dumps(['JavaScript']), 'Complex aggregation pipelines.', json.dumps(['Uber', 'Airbnb']), 'waiting for review', None, 35, None),
     ('FastAPI Backend', 'Jacob', json.dumps(['Python']), 'REST API implementation.', json.dumps(['Stripe']), 'review in process', 'David', 55, None),
     
-    # 6-8: Other users
     ('Redis Cache Stream', 'Alice', json.dumps(['Python']), 'High-throughput caching layer.', json.dumps(['Spotify']), 'waiting for review', None, 40, None),
     ('Docker Compose Setup', 'Bob', json.dumps(['YAML']), 'Orchestration for 5 containers.', json.dumps(['GitHub']), 'reviewed', 'Grace', 25, None),
     ('OpenShift Deploy', 'Charlie', json.dumps(['YAML', 'Shell']), 'Deployment configurations.', json.dumps(['IBM', 'Oracle']), 'waiting for review', None, 70, None),
     
-    # 9-12: More variety
     ('Data Cleansing Script', 'David', json.dumps(['Python', 'Pandas']), 'Pandas script to clean CSVs.', json.dumps(['Apple']), 'review in process', 'Ivan', 30, None),
     ('SQL Window Functions', 'Eve', json.dumps(['SQL']), 'Advanced analytical queries.', json.dumps(['Palantir']), 'reviewed', 'Kevin', 80, None),
     ('Java Auth Microservice', 'Frank', json.dumps(['Java']), 'Spring Boot microservice.', json.dumps(['Amazon']), 'waiting for review', None, 30, None),
     ('React Dropdown', 'Grace', json.dumps(['JavaScript']), 'Dynamic dropdown menu.', json.dumps(['Microsoft']), 'review in process', 'Judy', 40, None),
     
-    # 13-16: Public + variety
     ('iOS Map View', 'Heidi', json.dumps(['Swift']), 'iOS app logic for map view.', json.dumps(['public']), 'waiting for review', None, 50, None),
     ('Concurrent Web Scraper', 'Ivan', json.dumps(['Go']), 'Web scraper in Golang.', json.dumps(['Stripe', 'Google']), 'reviewed', 'Laura', 75, None),
     ('Simple Calculator', 'Judy', json.dumps(['Python']), 'Basic calculator utility.', json.dumps(['public']), 'review in process', 'Mallory', 15, None),
     ('Active Record Migration', 'Kevin', json.dumps(['Ruby']), 'Rails database migration.', json.dumps(['Airbnb']), 'waiting for review', None, 50, None),
     
-    # 17-20: Final batch
     ('Unity Character Movement', 'Laura', json.dumps(['C#']), '3D character physics.', json.dumps(['public']), 'reviewed', 'Niaj', 40, None),
     ('Custom Memory Allocator', 'Mallory', json.dumps(['C++']), 'Low-level memory allocator.', json.dumps(['Tesla']), 'waiting for review', None, 20, None),
     ('Scikit-Learn ML Model', 'Niaj', json.dumps(['Python']), 'ML model predicting prices.', json.dumps(['Adobe']), 'review in process', 'Olivia', 45, None),
@@ -115,11 +110,11 @@ if connection and cursor:
         tasks_inserted = cursor.rowcount
 
         connection.commit()
-        print(f"✅ Success! {users_inserted} users, {tasks_inserted} tasks, + code column")
+        print(f"Success! {users_inserted} users, {tasks_inserted} tasks, + code column")
 
     except mysql.connector.Error as err:
-        print(f"❌ Database error: {err}")
+        print(f"Database error: {err}")
     finally:
         close_connection(connection, cursor)
 else:
-    print("❌ No database connection")
+    print("No database connection")
