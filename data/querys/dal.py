@@ -1,8 +1,6 @@
 from data.hacaton.utils.connection import get_connection
-from data.querys.moduls import TaskCreate, UserCreate, UserUpdate
 import mysql.connector
 import json
-from fastapi import APIRouter, Form, File, UploadFile
 
 connection, cursor = get_connection()
 
@@ -36,7 +34,7 @@ def cursor_to_dict(data):
     return response
 
 
-  def get_user(username):  # 1
+def get_user(username):  # 1
     try:
         query = """
         SELECT * FROM users

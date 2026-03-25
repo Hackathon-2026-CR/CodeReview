@@ -51,7 +51,7 @@ class AddTask:
 # מודל בסיסי לתגובה חיובית
 class SuccessResponse(BaseModel):
     ok: bool = True
-    data: Optional[Any] = None
+    user: Optional[Any] = None
 
 # מודל בסיסי לשגיאה
 class ErrorResponse(BaseModel):
