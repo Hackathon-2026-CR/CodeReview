@@ -1,18 +1,21 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/Navbar";
 
 function MyTasksPage() {
   const [myTasks, setMyTasks] = React.useState([]);
   const [workingTasks, setWorkingTasks] = React.useState([]);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const username = localStorage.getItem("username");
+
+        if (!user?.username) return;
         const response = await fetch(
-          `http://localhost:8000/api/tasks/my-tasks/${username}`,
+          `http://localhost:8000/api/tasks/my-tasks/${user.username}`,
         );
         const data = await response.json();
         setMyTasks(data);
@@ -22,14 +25,14 @@ function MyTasksPage() {
     };
 
     fetchTasks();
-  }, []);
+  }, [user?.username]);
 
   useEffect(() => {
     const fetchWorkingTasks = async () => {
       try {
-        const username = localStorage.getItem("username");
+        if (!user?.username) return;
         const response = await fetch(
-          `http://localhost:8000/api/tasks/working-tasks/${username}`,
+          `http://localhost:8000/api/tasks/working-tasks/${user.username}`,
         );
         const data = await response.json();
         setWorkingTasks(data);
@@ -39,7 +42,7 @@ function MyTasksPage() {
     };
 
     fetchWorkingTasks();
-  }, []);
+  }, [user?.username]);
 
   return (
     <div>
