@@ -196,13 +196,14 @@ def add_task_manually(task_data):  # מקבל אובייקט מסוג AddTask
 def add_to_users(usercreate):
     try:
         insert_query = """
-        INSERT INTO users (name, password)
-        VALUES (%(name)s, %(password)s)
-        """  # ← Only name/password - others use DB defaults
+        INSERT INTO users (name, password, email)
+        VALUES (%(name)s, %(password)s, %(email)s)
+        """ 
 
         user_data = {
             "name": usercreate.name,
-            "password": usercreate.password
+            "password": usercreate.password,
+            "email": usercreate.email
         }
 
         cursor.execute(insert_query, user_data)
