@@ -1,0 +1,67 @@
+/* ── Page ── */
+.task-details-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ── Card ── */
+.task-details-card {
+  background-color: #1e1e2e;
+  border: 1px solid #a78bfa44;
+  border-radius: 14px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.task-details-card h1 {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #a78bfa;
+  margin: 0;
+}
+
+.task-details-card p {
+  color: #cdd6f4;
+  font-size: 0.95rem;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── Meta info (languages, price, etc.) ── */
+.task-details-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.task-details-badge {
+  background-color: #2a2a3e;
+  border: 1px solid #a78bfa44;
+  color: #a78bfa;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* ── Divider ── */
+.task-details-divider {
+  border: none;
+  border-top: 1px solid #a78bfa22;
+}
+
+/* ── Not found ── */
+.task-not-found {
+  color: #555;
+  font-size: 0.95rem;
+  font-style: italic;
+  text-align: center;
+  margin-top: 3rem;
+}

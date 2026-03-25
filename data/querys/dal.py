@@ -1,8 +1,6 @@
 from data.hacaton.utils.connection import get_connection
-from data.querys.moduls import TaskCreate, UserCreate, UserUpdate
 import mysql.connector
 import json
-from fastapi import APIRouter, Form, File, UploadFile
 
 connection, cursor = get_connection()
 
@@ -30,6 +28,7 @@ def cursor_to_dict(data):
         if rating:
             row_dict["rating"] = float(rating)  # make it float and not decimal
 
+
         response.append(row_dict)
 
     return response
@@ -52,7 +51,6 @@ def get_user(username):  # 1
 
 
 def published_codes(username):  # 2
-
     try:
         query = """
         SELECT * FROM tasks
@@ -97,7 +95,6 @@ def working_on(reviwer_name):  # 3
 
 
 def finished(reviwer_name):  # 4
-
     try:
         query = """
         SELECT * FROM tasks
@@ -118,42 +115,38 @@ def finished(reviwer_name):  # 4
         print(f"Database error: {err}")
 
 
-def get_available_by_user(username):  # 5
+def get_available_by_user(username): # 5
     try:
-        user_query = """
-        SELECT `groups` FROM users
-        WHERE `name` = %s
+        user = """
+        SELECT groups FROM users
+        WHERE user = %s
         """
-        cursor.execute(user_query, (username,))
-        result = cursor.fetchone()
-        
-        if not result:
-            print(f"No user found: {username}")
-            return []
-        
-        user_groups = json.loads(result[0])  
-        
-        groups_json = json.dumps(user_groups)  
-        
-        task_query = """
+        cursor.execute(user, [username])
+        groups = cursor.fetchone()
+
+        query = """
         SELECT t.* 
         FROM tasks t
-        WHERE JSON_OVERLAPS(t.groups, %s)
-           OR JSON_CONTAINS(t.groups, '"public"')
+        JOIN users u ON u.name = %s
+        WHERE JSON_OVERLAPS(t.groups, u.`groups`) 
+           OR JSON_CONTAINS(t.groups, '"public"');
         """
-        cursor.execute(task_query, (groups_json,))
+        cursor.execute(query, groups)
         answer = cursor.fetchall()
+        response = []
+        if answer:
+            for row in answer:
+                response.append(row)
+            cursor_to_dict(response)
         
-        response = [cursor_to_dict([row])[0] for row in answer] if answer else []
-        return response
-        
+        else:
+            print(f"No codes found for reviewer: {username}")
+
     except mysql.connector.Error as err:
         return f"Database error: {err}"
-    except json.JSONDecodeError as err:
-        return f"JSON parse error: {err}"
 
 
-def get_full_task_by_id(id):  # 6
+def get_full_task_by_id(id): # 6
     try:
         query = """
         SELECT * FROM tasks
@@ -203,13 +196,14 @@ def add_task_manually(task_data):  # מקבל אובייקט מסוג AddTask
 def add_to_users(usercreate):
     try:
         insert_query = """
-        INSERT INTO users (name, password)
-        VALUES (%(name)s, %(password)s)
-        """  # ← Only name/password - others use DB defaults
+        INSERT INTO users (name, password, email)
+        VALUES (%(name)s, %(password)s, %(email)s)
+        """ 
 
         user_data = {
             "name": usercreate.name,
-            "password": usercreate.password
+            "password": usercreate.password,
+            "email": usercreate.email
         }
 
         cursor.execute(insert_query, user_data)
