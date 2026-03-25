@@ -117,32 +117,33 @@ def finished(reviwer_name):  # 4
 
 def get_available_by_user(username): # 5
     try:
-        user = """
-        SELECT groups FROM users
-        WHERE user = %s
+        user_query = """
+        SELECT `groups` FROM users
+        WHERE `name` = %s
         """
-        cursor.execute(user, [username])
-        groups = cursor.fetchone()
-
-        query = """
+        cursor.execute(user_query, (username,))
+        user_result = cursor.fetchone()
+        
+        if not user_result:
+            print(f"No user: {username}")
+            return []
+        
+        user_groups = json.loads(user_result[0] or '[]')
+        user_groups_json = json.dumps(user_groups)
+        
+        task_query = """
         SELECT t.* 
         FROM tasks t
-        JOIN users u ON u.name = %s
-        WHERE JSON_OVERLAPS(t.groups, u.`groups`) 
-           OR JSON_CONTAINS(t.groups, '"public"');
+        WHERE JSON_OVERLAPS(t.`groups`, %s)
+           OR JSON_CONTAINS(t.`groups`, '"public"')
         """
-        cursor.execute(query, groups)
+        cursor.execute(task_query, (user_groups_json,))
         answer = cursor.fetchall()
-        response = []
-        if answer:
-            for row in answer:
-                response.append(row)
-            cursor_to_dict(response)
         
-        else:
-            print(f"No codes found for reviewer: {username}")
-
-    except mysql.connector.Error as err:
+        response = cursor_to_dict(answer) if answer else []  # Fixed: pass list directly
+        return response
+        
+    except Exception as err:
         return f"Database error: {err}"
 
 
