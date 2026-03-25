@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import "../styles/Navbar.css"
+import "../styles/Navbar.css";
 
 const pages = [
   { name: "Home", path: "/" },
   { name: "All Tasks", path: "/all-tasks" },
   { name: "My Tasks", path: "/my-tasks" },
   { name: "Add Task", path: "/add-task" },
+  { name: "Buy Credits", path: "/buy-credits" },
 ];
 
 export default function Navbar() {
