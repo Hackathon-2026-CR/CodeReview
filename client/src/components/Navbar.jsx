@@ -21,7 +21,7 @@ export default function Navbar() {
 
   return (
     <nav className="navbar">
-      <div className="navbar-logo">MyApp</div>
+      <div className="navbar-logo">ReviewLY</div>
 
       <ul className="navbar-list">
         {pages.map((page) => (
