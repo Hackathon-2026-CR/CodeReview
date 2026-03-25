@@ -1,11 +1,15 @@
 import mysql.connector
 from mysql.connector import errorcode
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 config = {
-    'user': 'root',
-    'password': 'root',
-    'host': '127.0.0.1',
-    'database': 'db'
+    'user': os.getenv('DB_USER', 'root'),
+    'password': os.getenv('DB_PASSWORD', 'root'),
+    'host': os.getenv('DB_HOST', '127.0.0.1'),
+    'database': os.getenv('DB_NAME', 'db')
 }
 
 def get_connection():
