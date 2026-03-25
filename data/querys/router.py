@@ -49,5 +49,5 @@ async def add_user(user: UserCreate):
 
 
 @router.post('/update-user')
-async def add_user(user: UserUpdate):
+async def update_user(user: UserUpdate):
     return dal.update_user_profile(user)
