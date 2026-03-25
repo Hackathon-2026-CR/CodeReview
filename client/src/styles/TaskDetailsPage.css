@@ -1,67 +1,57 @@
-/* ── Page ── */
-.task-details-container {
-  max-width: 800px;
-  margin: 2rem auto;
-  padding: 0 1rem;
+.task-details-header {
   display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-/* ── Card ── */
-.task-details-card {
-  background-color: #1e1e2e;
-  border: 1px solid #a78bfa44;
-  border-radius: 14px;
-  padding: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-}
-
-.task-details-card h1 {
-  font-size: 1.6rem;
-  font-weight: bold;
-  color: #a78bfa;
-  margin: 0;
-}
-
-.task-details-card p {
-  color: #cdd6f4;
-  font-size: 0.95rem;
-  margin: 0;
-  line-height: 1.6;
-}
-
-/* ── Meta info (languages, price, etc.) ── */
-.task-details-meta {
-  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
   flex-wrap: wrap;
-  gap: 0.8rem;
 }
 
-.task-details-badge {
-  background-color: #2a2a3e;
+.task-details-header h1 {
+  color: #cdd6f4;
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.task-details-price {
+  background: linear-gradient(135deg, #a78bfa22, #7c3aed22);
+  border: 1px solid #a78bfa55;
+  color: #a78bfa;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.task-details-description {
+  color: #888;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.task-details-badge.lang {
+  background: #2a2a3e;
   border: 1px solid #a78bfa44;
   color: #a78bfa;
-  padding: 5px 12px;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 500;
 }
 
-/* ── Divider ── */
-.task-details-divider {
-  border: none;
-  border-top: 1px solid #a78bfa22;
-}
-
-/* ── Not found ── */
-.task-not-found {
+.task-details-badge.group {
+  background: #2a2a3e;
+  border: 1px solid #ffffff0d;
   color: #555;
-  font-size: 0.95rem;
-  font-style: italic;
-  text-align: center;
-  margin-top: 3rem;
+}
+
+.task-details-author {
+  color: #555;
+  font-size: 0.85rem;
+  margin: 0;
+  border-top: 1px solid #ffffff06;
+  padding-top: 1rem;
+}
+
+.task-details-author span {
+  color: #a78bfa;
+  font-weight: 600;
 }

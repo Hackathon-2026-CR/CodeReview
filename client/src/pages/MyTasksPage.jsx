@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { api } from "../api";
 import Navbar from "../components/Navbar";
 import "../styles/MyTasksPage.css";
 
@@ -13,12 +14,14 @@ function MyTasksPage() {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        if (!user?.username) return;
-        const response = await fetch(
-          `https://nonpositivistic-unmesmerised-sharyn.ngrok-free.dev/api/tasks/my-tasks/${username}`,
+        const username = localStorage.getItem("username"); // ← fix
+        if (!username) return;
+
+        const response = await api.get(
+          `/api/tasks/my-tasks/${username}`,
         );
         const data = await response.json();
-        setMyTasks(data);
+        setMyTasks(data || []);
       } catch (error) {
         console.error("Error fetching my tasks:", error);
       }
@@ -30,12 +33,14 @@ function MyTasksPage() {
   useEffect(() => {
     const fetchWorkingTasks = async () => {
       try {
-        if (!user?.username) return;
-        const response = await fetch(
-          `https://nonpositivistic-unmesmerised-sharyn.ngrok-free.dev/api/tasks/working-tasks/${username}`,
+        const username = localStorage.getItem("username"); // ← fix
+        if (!username) return;
+
+        const response = await api.get(
+          `/api/tasks/working-tasks/${username}`,
         );
         const data = await response.json();
-        setWorkingTasks(data);
+        setWorkingTasks(data || []);
       } catch (error) {
         console.error("Error fetching working tasks:", error);
       }
@@ -51,18 +56,36 @@ function MyTasksPage() {
         <div>
           <h1>Tasks I'm working on :</h1>
           <ul>
-            {workingTasks.map((task) => (
-              <li key={task.id}>{task.title}</li>
-            ))}
+            {workingTasks.length === 0 ? (
+              <p className="my-tasks-empty">No tasks in progress.</p>
+            ) : (
+              workingTasks.map((task) => (
+                <li
+                  key={task.id}
+                  onClick={() => navigate(`/task-details/${task.id}`)}
+                >
+                  {task.title}
+                </li>
+              ))
+            )}
           </ul>
         </div>
 
         <div className="my-tasks-container">
           <h1>My Tasks :</h1>
           <ul>
-            {myTasks.map((task) => (
-              <li key={task.id}>{task.title}</li>
-            ))}
+            {myTasks.length === 0 ? (
+              <p className="my-tasks-empty">No tasks created yet.</p>
+            ) : (
+              myTasks.map((task) => (
+                <li
+                  key={task.id}
+                  onClick={() => navigate(`/task-details/${task.id}`)}
+                >
+                  {task.title}
+                </li>
+              ))
+            )}
           </ul>
         </div>
 
