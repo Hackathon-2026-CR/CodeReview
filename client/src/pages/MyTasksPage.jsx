@@ -12,7 +12,7 @@ function MyTasksPage() {
       try {
         const username = localStorage.getItem("username");
         const response = await fetch(
-          `http://localhost:8000/api/tasks/my-tasks/${username}`,
+          `https://nonpositivistic-unmesmerised-sharyn.ngrok-free.dev/api/tasks/my-tasks/${username}`,
         );
         const data = await response.json();
         setMyTasks(data);
@@ -29,7 +29,7 @@ function MyTasksPage() {
       try {
         const username = localStorage.getItem("username");
         const response = await fetch(
-          `http://localhost:8000/api/tasks/working-tasks/${username}`,
+          `https://nonpositivistic-unmesmerised-sharyn.ngrok-free.dev/api/tasks/working-tasks/${username}`,
         );
         const data = await response.json();
         setWorkingTasks(data);

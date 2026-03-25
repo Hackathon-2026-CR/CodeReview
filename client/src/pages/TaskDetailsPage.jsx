@@ -10,7 +10,7 @@ function TaskDetailsPage() {
     const fetchTaskDetails = async () => {
       try {
         // endpoint 6 : "/api/tasks/:id"
-        const response = await fetch(`http://localhost:8000/api/tasks/${id}`);
+        const response = await fetch(`https://nonpositivistic-unmesmerised-sharyn.ngrok-free.dev/api/tasks/${id}`);
         const data = await response.json();
         setTask(data);
       } catch (error) {

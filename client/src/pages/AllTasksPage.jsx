@@ -10,9 +10,7 @@ function AllTasksPage() {
     const fetchTasks = async () => {
       try {
         const username = localStorage.getItem("username");
-        const response = await fetch(
-          `http://localhost:8000/api/tasks/all-tasks/${username}`,
-        );
+        const response = await fetch(`https://nonpositivistic-unmesmerised-sharyn.ngrok-free.dev/api/tasks/all-tasks/${username}`);
         const data = await response.json();
         setTasks(data);
       } catch (error) {
