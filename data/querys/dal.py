@@ -168,39 +168,6 @@ def get_full_task_by_id(id):  # 6
         print(f"Database error: {err}")
 
 
-# 7
-# def add_task_upload_file(
-#     title: str, user_name: str, languages: str,
-#     description: str | None, groups: str, price: int, file: UploadFile
-# ):
-#     try:
-#         code = file.file.read().decode('utf-8')
-#         code = json.loads(code)
-#         task_dict = {
-#             "title": title,
-#             "user_name": user_name,
-#             "languages": json.dumps(languages.split(",")),
-#             "description": description,
-#             "groups": json.dumps(groups.split(",")),
-#             "price": price,
-#             "code": code
-#         }
-#
-#         insert_query = """
-#         INSERT INTO tasks (title, user_name, languages, description, `groups`, price, code)
-#         VALUES (%(title)s, %(user_name)s, %(languages)s, %(description)s, %(groups)s, %(price)s, %(code)s)
-#         """
-#
-#         cursor.execute(insert_query, task_dict)
-#         connection.commit()
-#
-#         return {
-#             "response": f"task '{task_dict['title']}' added"
-#         }
-#     except Exception as err:
-#         return {"error from dal": str(err)}
-#
-
 # 8
 def add_task_manually(task_data):  # מקבל אובייקט מסוג AddTask
 
