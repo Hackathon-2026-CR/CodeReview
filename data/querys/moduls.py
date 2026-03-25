@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from fastapi import Form, File, UploadFile
-from typing import Optional
+from typing import Optional, Any
 
 
 class TaskCreate(BaseModel):
@@ -45,3 +45,24 @@ class AddTask:
         self.groups = groups
         self.code = code
         self.file = file
+
+
+# מודל בסיסי לתגובה חיובית
+class SuccessResponse(BaseModel):
+    ok: bool = True
+    data: Optional[Any] = None
+
+# מודל בסיסי לשגיאה
+class ErrorResponse(BaseModel):
+    ok: bool = False
+    error: str
+
+# מודל ספציפי למשתמש (לשימוש בתוך ה-SuccessResponse)
+class UserSchema(BaseModel):
+    id: int
+    username: str
+
+# מודל לכניסה (Login)
+class LoginSchema(BaseModel):
+    username: str
+    password: str

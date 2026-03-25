@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Form, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from data.querys import dal
-from data.querys.moduls import TaskCreate, AddTask, UserCreate, UserUpdate
+from data.querys.moduls import AddTask, UserCreate, UserUpdate, LoginSchema, SuccessResponse, ErrorResponse, UserSchema
 
 router = APIRouter(
     prefix="/api/tasks",
@@ -51,3 +51,25 @@ async def add_user(user: UserCreate = Depends()):
 @router.post('/update-user')
 async def update_user(user: UserUpdate = Depends()):
     return dal.update_user_profile(user)
+
+
+@router.post("/login",
+             response_model=SuccessResponse,
+             responses={401: {"model": ErrorResponse}})
+def login(credentials: LoginSchema):
+    user_data = dal.get_user(credentials.username)
+
+    if not user_data or user_data['password'] != credentials.password:
+        raise HTTPException(
+            status_code=401,
+            detail={"ok": False, "error": "Invalid credentials"}
+        )
+
+    # החזרה של המבנה הכללי עם הנתונים הספציפיים
+    return {
+            "ok": True,
+            "data": {
+                "id": user_data['id'],
+                "username": user_data['name']
+            }
+        }
