@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Form, Depends
-from querys import dal
-from querys.moduls import TaskCreate, AddTask
+from fastapi import APIRouter, Depends, HTTPException
+from data.querys import dal
+from data.querys.moduls import AddTask, UserCreate, UserUpdate, LoginSchema, SuccessResponse, ErrorResponse, UserSchema
+
 
 router = APIRouter(
     prefix="/api/tasks",
@@ -28,11 +29,6 @@ def get_tasks_the_user_has_finished(reviwer_name):
     return dal.finished(reviwer_name)
 
 
-# @router.post('/add-task')
-# def add_task(task: TaskCreate):
-#     return dal.add_task_to_codes(task)
-
-
 @router.get('/all-tasks/{user_name}')
 def get_all_tasks(user_name):
     return dal.get_available_by_user(user_name)
@@ -43,19 +39,37 @@ def get_task_using_id(id):
     return dal.get_full_task_by_id(id)
 
 
-@router.post('/add-task-with-file')
+@router.post('/add-task')
 async def add_task_with_file(task: AddTask = Depends()):
     return dal.add_task_manually(task)
 
 
-# @router.post('/add-task')
-# async def add_task(
-#         title: str = Form(...),
-#         user_name: str = Form(...),
-#         languages: str = Form("Python"),
-#         description: str | None = Form(None),
-#         groups: str = Form("public"),
-#         price: int = Form(...),
-#         code: str = Form(...)
-# ):
-#     return dal.add_task_manually(title, user_name, languages, description, groups, price, code)
+@router.post('/add-user')
+async def add_user(user: UserCreate):
+    return dal.add_to_users(user)
+
+
+@router.post('/update-user')
+async def update_user(user: UserUpdate):
+    return dal.update_user_profile(user)
+
+
+@router.post("/login",
+             response_model=SuccessResponse,
+             responses={401: {"model": ErrorResponse}})
+def login(credentials: LoginSchema):
+    user_data = dal.get_user(credentials.username)
+
+    if not user_data or user_data['password'] != credentials.password:
+        raise HTTPException(
+            status_code=401,
+            detail={"ok": False, "error": "Invalid credentials"}
+        )
+
+    return {
+            "ok": True,
+            "data": {
+                "id": user_data['id'],
+                "username": user_data['name']
+            }
+        }
