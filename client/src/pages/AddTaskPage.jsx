@@ -59,13 +59,17 @@ export default function AddTaskPage() {
     ) {
       alert(
         "Please fill all required fields: Title, Languages, Price" +
-          (mode === "manual" ? ", Code" : ", File")
+          (mode === "manual" ? ", Code" : ", File"),
       );
       return;
     }
 
     // ✅ Fix 2 — validation taille fichier (max 5MB)
-    if (mode === "file" && taskData.file && taskData.file.size > 5 * 1024 * 1024) {
+    if (
+      mode === "file" &&
+      taskData.file &&
+      taskData.file.size > 5 * 1024 * 1024
+    ) {
       alert("File too large. Maximum size is 5MB.");
       return;
     }

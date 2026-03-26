@@ -48,7 +48,11 @@ export default function TaskDetailsPage() {
         alert(data.error || "Could not take task.");
         return;
       }
-      setTask((prev) => ({ ...prev, status: "review in process", reviewer: username }));
+      setTask((prev) => ({
+        ...prev,
+        status: "review in process",
+        reviewer: username,
+      }));
       setSuccess("Task taken! You can now review the code.");
     } catch {
       alert("Network error.");
@@ -57,9 +61,8 @@ export default function TaskDetailsPage() {
     }
   };
 
-  // ✅ Nouveau — annuler la prise
   const handleCancelTask = async () => {
-    if (!window.confirm("Are you sure you want to cancel this review? Your credits will be refunded.")) return;
+    if (!window.confirm("Are you sure you want to cancel this task?")) return;
     setActionLoading(true);
     try {
       const res = await api.post(`/api/tasks/cancel-task/${id}`, {
@@ -70,8 +73,14 @@ export default function TaskDetailsPage() {
         alert(data.error || "Could not cancel task.");
         return;
       }
-      setTask((prev) => ({ ...prev, status: "pending", reviewer: null }));
-      setSuccess("Task cancelled. Your credits have been refunded.");
+      setTask((prev) => ({
+        ...prev,
+        status: "pending",
+        reviewer: null,
+        review_content: null,
+      }));
+      // ✅ Fix — plus de mention remboursement
+      setSuccess("Task cancelled successfully.");
     } catch {
       alert("Network error.");
     } finally {
@@ -79,7 +88,6 @@ export default function TaskDetailsPage() {
     }
   };
 
-  // ✅ Fix — reviewer soumet son contenu de review
   const handleSubmitReview = async () => {
     if (!reviewContent.trim()) {
       alert("Please write your review before submitting.");
@@ -96,8 +104,14 @@ export default function TaskDetailsPage() {
         alert(data.error || "Could not submit review.");
         return;
       }
-      setTask((prev) => ({ ...prev, status: "reviewed", review_content: reviewContent }));
-      setSuccess("Review submitted! Waiting for the creator to rate it.");
+      setTask((prev) => ({
+        ...prev,
+        status: "reviewed",
+        review_content: reviewContent,
+      }));
+      setSuccess(
+        "Review submitted! Credits have been transferred to your account.",
+      );
     } catch {
       alert("Network error.");
     } finally {
@@ -105,21 +119,25 @@ export default function TaskDetailsPage() {
     }
   };
 
-  // ✅ Nouveau — créateur note la review
   const handleRateReview = async () => {
+    const parsedRating = parseInt(rating);
+    if (isNaN(parsedRating) || parsedRating < 1 || parsedRating > 5) {
+      alert("Rating must be a number between 1 and 5.");
+      return;
+    }
     setActionLoading(true);
     try {
       const res = await api.post(`/api/tasks/rate-review/${id}`, {
         creator: username,
-        rating: parseInt(rating),
+        rating: parsedRating,
       });
       if (!res.ok) {
         const data = await res.json();
         alert(data.error || "Could not rate review.");
         return;
       }
-      setTask((prev) => ({ ...prev, rating: parseInt(rating) }));
-      setSuccess("Review rated successfully! Credits have been transferred.");
+      setTask((prev) => ({ ...prev, rating: parsedRating }));
+      setSuccess("Review rated successfully!");
     } catch {
       alert("Network error.");
     } finally {
@@ -127,31 +145,48 @@ export default function TaskDetailsPage() {
     }
   };
 
-  if (loading) return <div><Navbar /><p className="td-empty">Loading...</p></div>;
-  if (error)   return <div><Navbar /><p className="td-empty">{error}</p></div>;
-  if (!task)   return null;
+  if (loading)
+    return (
+      <div>
+        <Navbar />
+        <p className="td-empty">Loading...</p>
+      </div>
+    );
+  if (error)
+    return (
+      <div>
+        <Navbar />
+        <p className="td-empty">{error}</p>
+      </div>
+    );
+  if (!task) return null;
 
-  const isCreator  = username === task.user_name;
+  const isCreator = username === task.user_name;
   const isReviewer = username === task.reviewer;
-  const isVisitor  = !isCreator && !isReviewer;
+  const isVisitor = !isCreator && !isReviewer;
 
   return (
     <div>
       <Navbar />
       <div className="td-container">
-
         {/* ── Header ── */}
         <div className="td-header">
           <h1 className="td-title">{task.title}</h1>
-          <span className={`td-status td-status--${task.status.replace(/ /g, "-")}`}>
+          <span
+            className={`td-status td-status--${task.status.replace(/ /g, "-")}`}
+          >
             {task.status}
           </span>
         </div>
 
         {/* ── Meta ── */}
         <div className="td-meta">
-          <span>By <strong>{task.user_name}</strong></span>
-          <span><strong>{task.price}</strong> credits</span>
+          <span>
+            By <strong>{task.user_name}</strong>
+          </span>
+          <span>
+            <strong>{task.price}</strong> credits
+          </span>
           {task.languages?.length > 0 && (
             <span>{task.languages.join(", ")}</span>
           )}
@@ -165,26 +200,29 @@ export default function TaskDetailsPage() {
         {(isCreator || isReviewer) && task.code && (
           <div className="td-code-block">
             <h2>Code to review</h2>
-            <pre><code>{task.code}</code></pre>
+            <pre>
+              <code>{task.code}</code>
+            </pre>
           </div>
         )}
 
-        {/* ── Contenu de la review (créateur après reviewed) ── */}
+        {/* ── Contenu review (créateur après reviewed) ── */}
         {isCreator && task.status === "reviewed" && task.review_content && (
           <div className="td-code-block">
             <h2>Review from {task.reviewer}</h2>
-            <pre><code>{task.review_content}</code></pre>
+            <pre>
+              <code>{task.review_content}</code>
+            </pre>
           </div>
         )}
 
         {/* ── Rating final ── */}
-        {task.rating !== null && (
+        {task.rating !== null && !isNaN(task.rating) && (
           <div className="td-rating">
             ⭐ Rating given : <strong>{task.rating} / 5</strong>
           </div>
         )}
 
-        {/* ── Success message ── */}
         {success && <p className="td-success">{success}</p>}
 
         {/* ── VISITEUR — prendre la task ── */}
@@ -194,7 +232,9 @@ export default function TaskDetailsPage() {
             onClick={handleTakeTask}
             disabled={actionLoading}
           >
-            {actionLoading ? "Processing..." : `Take Task (${task.price} credits)`}
+            {actionLoading
+              ? "Processing..."
+              : `Take Task (+${task.price} credits)`}
           </button>
         )}
 
@@ -218,12 +258,13 @@ export default function TaskDetailsPage() {
               >
                 {actionLoading ? "Submitting..." : "Submit Review"}
               </button>
+              {/* ✅ Fix — "Cancel Task" sans mention remboursement */}
               <button
                 className="td-cancel-btn"
                 onClick={handleCancelTask}
                 disabled={actionLoading}
               >
-                Cancel & Refund
+                {actionLoading ? "Cancelling..." : "Cancel Task"}
               </button>
             </div>
           </div>
@@ -234,12 +275,16 @@ export default function TaskDetailsPage() {
           <>
             <p className="td-info">
               {task.status === "pending" && "⏳ Waiting for a reviewer..."}
-              {task.status === "review in process" && `🔍 Being reviewed by ${task.reviewer}`}
-              {task.status === "reviewed" && task.rating === null && "✅ Review received! Please rate it below."}
-              {task.status === "reviewed" && task.rating !== null && "✅ All done!"}
+              {task.status === "review in process" &&
+                `🔍 Being reviewed by ${task.reviewer}`}
+              {task.status === "reviewed" &&
+                task.rating === null &&
+                "✅ Review received! Please rate it below."}
+              {task.status === "reviewed" &&
+                task.rating !== null &&
+                "✅ All done!"}
             </p>
 
-            {/* ✅ Créateur note la review après l'avoir lue */}
             {task.status === "reviewed" && task.rating === null && (
               <div className="td-review-form">
                 <h2>Rate this review</h2>

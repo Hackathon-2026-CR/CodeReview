@@ -85,7 +85,7 @@ const submitReview = async (req, res) => {
     const result = await taskService.submitReview(
       req.params.id,
       req.body.reviewer,
-      req.body.rating
+      req.body.review_content
     );
     res.json(result);
   } catch (err) {

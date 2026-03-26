@@ -23,6 +23,8 @@ router.post("/add-task", upload.single("file"), taskController.addTask);
 
 // ✅ Nouvelles routes
 router.post("/take-task/:id", taskController.takeTask);
+router.post("/cancel-task/:id", taskController.cancelTask);
 router.post("/submit-review/:id", taskController.submitReview);
+router.post("/rate-review/:id", taskController.rateReview);
 
 module.exports = router;

@@ -41,7 +41,7 @@ export default function AccountPage() {
     setEditValue(
       Array.isArray(currentValue)
         ? currentValue.join(", ")
-        : (currentValue ?? "")
+        : (currentValue ?? ""),
     );
   };
 
