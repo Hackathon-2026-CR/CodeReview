@@ -96,6 +96,36 @@ const submitReview = async (req, res) => {
     res.status(status).json({ error: err.message });
   }
 };
+const cancelTask = async (req, res) => {
+  try {
+    const result = await taskService.cancelTask(req.params.id, req.body.reviewer);
+    res.json(result);
+  } catch (err) {
+    const status =
+      err.message === "Task not found" ? 404
+      : err.message === "You are not the reviewer of this task" ? 403
+      : 400;
+    res.status(status).json({ error: err.message });
+  }
+};
+
+
+const rateReview = async (req, res) => {
+  try {
+    const result = await taskService.rateReview(
+      req.params.id,
+      req.body.creator,
+      req.body.rating
+    );
+    res.json(result);
+  } catch (err) {
+    const status =
+      err.message === "Task not found" ? 404
+      : err.message === "Only the task creator can rate the review" ? 403
+      : 400;
+    res.status(status).json({ error: err.message });
+  }
+};
 
 module.exports = {
   getMyTasks,
@@ -105,5 +135,8 @@ module.exports = {
   getTaskById,
   addTask,
   takeTask,
-  submitReview,
+  cancelTask,   
+  submitReview, 
+  rateReview,   
 };
+

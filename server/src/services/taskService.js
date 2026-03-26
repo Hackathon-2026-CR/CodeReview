@@ -39,7 +39,7 @@ const addTask = async ({ title, user_name, price, languages, description, groups
   return { status: "success", message: `Task '${task.title}' added successfully`, id: task._id };
 };
 
-// ✅ Nouveau — prendre une task
+// ── Prendre une task ────────────────────────────────
 const takeTask = async (taskId, reviewerUsername) => {
   const task = await taskDal.findById(taskId);
   if (!task) throw new Error("Task not found");
@@ -50,45 +50,78 @@ const takeTask = async (taskId, reviewerUsername) => {
   if (!reviewer) throw new Error("Reviewer not found");
   if (reviewer.credits < task.price) throw new Error("Not enough credits");
 
-  // Déduit les crédits du reviewer
   await userDal.updateByName(reviewerUsername, {
     credits: reviewer.credits - task.price,
   });
 
-  // Met à jour la task
   await taskDal.updateTask(taskId, {
     reviewer: reviewerUsername,
     status: "review in process",
   });
 
-  return { status: "success", message: `Task taken successfully` };
+  return { status: "success", message: "Task taken successfully" };
 };
 
-// ✅ Nouveau — soumettre une review
-const submitReview = async (taskId, reviewerUsername, rating) => {
+// ── Annuler la prise d'une task ─────────────────────
+const cancelTask = async (taskId, reviewerUsername) => {
   const task = await taskDal.findById(taskId);
   if (!task) throw new Error("Task not found");
   if (task.status !== "review in process") throw new Error("Task is not in review");
   if (task.reviewer !== reviewerUsername) throw new Error("You are not the reviewer of this task");
 
-  if (!rating || rating < 1 || rating > 5)
-    throw new Error("Rating must be between 1 and 5");
+  // Rembourse les crédits au reviewer
+  const reviewer = await userDal.findByName(reviewerUsername);
+  if (reviewer) {
+    await userDal.updateByName(reviewerUsername, {
+      credits: reviewer.credits + task.price,
+    });
+  }
 
-  // Crédite le créateur de la task
-  const creator = await userDal.findByName(task.user_name);
+  await taskDal.updateTask(taskId, {
+    reviewer: null,
+    status: "pending",
+    review_content: null,
+  });
+
+  return { status: "success", message: "Task cancelled and credits refunded" };
+};
+
+// ── Soumettre le contenu de review (reviewer) ───────
+const submitReview = async (taskId, reviewerUsername, reviewContent) => {
+  const task = await taskDal.findById(taskId);
+  if (!task) throw new Error("Task not found");
+  if (task.status !== "review in process") throw new Error("Task is not in review");
+  if (task.reviewer !== reviewerUsername) throw new Error("You are not the reviewer of this task");
+  if (!reviewContent || reviewContent.trim() === "") throw new Error("Review content is required");
+
+  await taskDal.updateTask(taskId, {
+    status: "reviewed",
+    review_content: reviewContent,
+  });
+
+  return { status: "success", message: "Review submitted successfully" };
+};
+
+// ── Noter la review (créateur) ──────────────────────
+const rateReview = async (taskId, creatorUsername, rating) => {
+  const task = await taskDal.findById(taskId);
+  if (!task) throw new Error("Task not found");
+  if (task.status !== "reviewed") throw new Error("Task has not been reviewed yet");
+  if (task.user_name !== creatorUsername) throw new Error("Only the task creator can rate the review");
+  if (task.rating !== null) throw new Error("Review already rated");
+  if (!rating || rating < 1 || rating > 5) throw new Error("Rating must be between 1 and 5");
+
+  // Crédite le créateur seulement après notation
+  const creator = await userDal.findByName(creatorUsername);
   if (creator) {
-    await userDal.updateByName(task.user_name, {
+    await userDal.updateByName(creatorUsername, {
       credits: creator.credits + task.price,
     });
   }
 
-  // Finalise la task
-  await taskDal.updateTask(taskId, {
-    status: "reviewed",
-    rating,
-  });
+  await taskDal.updateTask(taskId, { rating });
 
-  return { status: "success", message: "Review submitted successfully" };
+  return { status: "success", message: "Review rated successfully" };
 };
 
 module.exports = {
@@ -99,5 +132,7 @@ module.exports = {
   getTaskById,
   addTask,
   takeTask,
+  cancelTask,
   submitReview,
+  rateReview,
 };

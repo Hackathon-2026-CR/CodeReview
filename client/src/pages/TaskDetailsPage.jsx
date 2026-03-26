@@ -13,6 +13,7 @@ export default function TaskDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [rating, setRating] = useState(5);
+  const [reviewContent, setReviewContent] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
   const [success, setSuccess] = useState(null);
 
@@ -56,20 +57,69 @@ export default function TaskDetailsPage() {
     }
   };
 
+  // ✅ Nouveau — annuler la prise
+  const handleCancelTask = async () => {
+    if (!window.confirm("Are you sure you want to cancel this review? Your credits will be refunded.")) return;
+    setActionLoading(true);
+    try {
+      const res = await api.post(`/api/tasks/cancel-task/${id}`, {
+        reviewer: username,
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        alert(data.error || "Could not cancel task.");
+        return;
+      }
+      setTask((prev) => ({ ...prev, status: "pending", reviewer: null }));
+      setSuccess("Task cancelled. Your credits have been refunded.");
+    } catch {
+      alert("Network error.");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // ✅ Fix — reviewer soumet son contenu de review
   const handleSubmitReview = async () => {
+    if (!reviewContent.trim()) {
+      alert("Please write your review before submitting.");
+      return;
+    }
     setActionLoading(true);
     try {
       const res = await api.post(`/api/tasks/submit-review/${id}`, {
         reviewer: username,
-        rating: parseInt(rating),
+        review_content: reviewContent,
       });
       if (!res.ok) {
         const data = await res.json();
         alert(data.error || "Could not submit review.");
         return;
       }
-      setTask((prev) => ({ ...prev, status: "reviewed", rating: parseInt(rating) }));
-      setSuccess("Review submitted successfully!");
+      setTask((prev) => ({ ...prev, status: "reviewed", review_content: reviewContent }));
+      setSuccess("Review submitted! Waiting for the creator to rate it.");
+    } catch {
+      alert("Network error.");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // ✅ Nouveau — créateur note la review
+  const handleRateReview = async () => {
+    setActionLoading(true);
+    try {
+      const res = await api.post(`/api/tasks/rate-review/${id}`, {
+        creator: username,
+        rating: parseInt(rating),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        alert(data.error || "Could not rate review.");
+        return;
+      }
+      setTask((prev) => ({ ...prev, rating: parseInt(rating) }));
+      setSuccess("Review rated successfully! Credits have been transferred.");
     } catch {
       alert("Network error.");
     } finally {
@@ -114,24 +164,30 @@ export default function TaskDetailsPage() {
         {/* ── Code (créateur + reviewer uniquement) ── */}
         {(isCreator || isReviewer) && task.code && (
           <div className="td-code-block">
-            <h2>Code</h2>
+            <h2>Code to review</h2>
             <pre><code>{task.code}</code></pre>
           </div>
         )}
 
+        {/* ── Contenu de la review (créateur après reviewed) ── */}
+        {isCreator && task.status === "reviewed" && task.review_content && (
+          <div className="td-code-block">
+            <h2>Review from {task.reviewer}</h2>
+            <pre><code>{task.review_content}</code></pre>
+          </div>
+        )}
+
         {/* ── Rating final ── */}
-        {task.status === "reviewed" && (
+        {task.rating !== null && (
           <div className="td-rating">
-            ⭐ Rating : <strong>{task.rating} / 5</strong>
+            ⭐ Rating given : <strong>{task.rating} / 5</strong>
           </div>
         )}
 
         {/* ── Success message ── */}
         {success && <p className="td-success">{success}</p>}
 
-        {/* ── Actions selon le rôle ── */}
-
-        {/* Visiteur — peut prendre la task */}
+        {/* ── VISITEUR — prendre la task ── */}
         {isVisitor && task.status === "pending" && (
           <button
             className="td-btn"
@@ -142,38 +198,72 @@ export default function TaskDetailsPage() {
           </button>
         )}
 
-        {/* Reviewer en cours — peut soumettre la review */}
+        {/* ── REVIEWER — soumettre review + annuler ── */}
         {isReviewer && task.status === "review in process" && (
           <div className="td-review-form">
             <h2>Submit your review</h2>
-            <label>
-              Rating (1–5) :
-              <input
-                type="number"
-                min={1}
-                max={5}
-                value={rating}
-                onChange={(e) => setRating(e.target.value)}
-                className="td-rating-input"
-              />
-            </label>
-            <button
-              className="td-btn"
-              onClick={handleSubmitReview}
-              disabled={actionLoading}
-            >
-              {actionLoading ? "Submitting..." : "Submit Review"}
-            </button>
+            <label>Your review</label>
+            <textarea
+              className="td-review-textarea"
+              placeholder="Write your code review here..."
+              value={reviewContent}
+              onChange={(e) => setReviewContent(e.target.value)}
+              rows={6}
+            />
+            <div className="td-review-actions">
+              <button
+                className="td-btn"
+                onClick={handleSubmitReview}
+                disabled={actionLoading}
+              >
+                {actionLoading ? "Submitting..." : "Submit Review"}
+              </button>
+              <button
+                className="td-cancel-btn"
+                onClick={handleCancelTask}
+                disabled={actionLoading}
+              >
+                Cancel & Refund
+              </button>
+            </div>
           </div>
         )}
 
-        {/* Créateur — voit juste le statut */}
+        {/* ── CRÉATEUR — statut + noter la review ── */}
         {isCreator && (
-          <p className="td-info">
-            {task.status === "pending" && "⏳ Waiting for a reviewer..."}
-            {task.status === "review in process" && `🔍 Being reviewed by ${task.reviewer}`}
-            {task.status === "reviewed" && "✅ Your task has been reviewed!"}
-          </p>
+          <>
+            <p className="td-info">
+              {task.status === "pending" && "⏳ Waiting for a reviewer..."}
+              {task.status === "review in process" && `🔍 Being reviewed by ${task.reviewer}`}
+              {task.status === "reviewed" && task.rating === null && "✅ Review received! Please rate it below."}
+              {task.status === "reviewed" && task.rating !== null && "✅ All done!"}
+            </p>
+
+            {/* ✅ Créateur note la review après l'avoir lue */}
+            {task.status === "reviewed" && task.rating === null && (
+              <div className="td-review-form">
+                <h2>Rate this review</h2>
+                <label>
+                  Rating (1–5) :
+                  <input
+                    type="number"
+                    min={1}
+                    max={5}
+                    value={rating}
+                    onChange={(e) => setRating(e.target.value)}
+                    className="td-rating-input"
+                  />
+                </label>
+                <button
+                  className="td-btn"
+                  onClick={handleRateReview}
+                  disabled={actionLoading}
+                >
+                  {actionLoading ? "Submitting..." : "Rate Review"}
+                </button>
+              </div>
+            )}
+          </>
         )}
 
         <button className="td-back-btn" onClick={() => navigate(-1)}>
