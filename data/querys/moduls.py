@@ -68,3 +68,12 @@ class UserSchema(BaseModel):
 class LoginSchema(BaseModel):
     username: str
     password: str
+
+
+class AssignReviewer(BaseModel):
+    reviewer: str
+    id: int
+
+
+class IdReviewer(BaseModel):
+    id: int

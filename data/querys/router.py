@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from data.querys import dal
-from data.querys.moduls import AddTask, UserCreate, UserUpdate, LoginSchema, SuccessResponse, ErrorResponse
+from data.querys.moduls import AddTask, UserCreate, UserUpdate, LoginSchema, SuccessResponse, ErrorResponse, AssignReviewer, IdReviewer
 
 
 router = APIRouter(
@@ -49,7 +49,7 @@ async def add_user(user: UserCreate):
     return dal.add_to_users(user)
 
 
-@router.post('/update-user')
+@router.put('/update-user')
 async def update_user(user: UserUpdate):
     return dal.update_user_profile(user)
 
@@ -73,3 +73,13 @@ def login(credentials: LoginSchema):
                 "username": user_data['name']
             }
         }
+
+
+@router.put('/assign-reviewer')
+def assign_reviewer(reviewer: AssignReviewer):
+    return dal.assign_reviewer(reviewer)
+
+
+@router.put('/finished-to-review')
+def finished_to_review(id: IdReviewer):
+    return dal.finished_to_review(id)
