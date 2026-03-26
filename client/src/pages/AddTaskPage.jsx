@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { api } from "../api";
 import "../styles/AddTaskPage.css";
 import Navbar from "../components/Navbar";
@@ -8,9 +9,11 @@ export default function AddTaskPage() {
   const [success, setSuccess] = useState(false);
   const [mode, setMode] = useState("file");
   const [fileKey, setFileKey] = useState(0);
+  const navigate = useNavigate();
 
   const [taskData, setTaskData] = useState({
     title: "",
+    // ✅ Fix 1 — user_name pré-rempli depuis localStorage, non modifiable
     user_name: localStorage.getItem("username") || "",
     price: 0,
     languages: "",
@@ -55,9 +58,21 @@ export default function AddTaskPage() {
       (mode === "file" && !taskData.file)
     ) {
       alert(
-        "Please fill all required fields: Title, User Name, Languages, Price" +
-          (mode === "manual" ? ", Code" : ", File"),
+        "Please fill all required fields: Title, Languages, Price" +
+          (mode === "manual" ? ", Code" : ", File")
       );
+      return;
+    }
+
+    // ✅ Fix 2 — validation taille fichier (max 5MB)
+    if (mode === "file" && taskData.file && taskData.file.size > 5 * 1024 * 1024) {
+      alert("File too large. Maximum size is 5MB.");
+      return;
+    }
+
+    // ✅ Fix 3 — price doit être > 0
+    if (taskData.price <= 0) {
+      alert("Price must be greater than 0.");
       return;
     }
 
@@ -96,7 +111,9 @@ export default function AddTaskPage() {
 
       resetForm();
       setSuccess(true);
-      setTimeout(() => setSuccess(false), 2000);
+
+      // ✅ Fix 4 — redirection vers /my-tasks après succès
+      setTimeout(() => navigate("/my-tasks"), 1500);
     } catch (err) {
       alert("Network error. Check your internet connection.");
     } finally {
@@ -121,13 +138,15 @@ export default function AddTaskPage() {
             />
           </div>
 
+          {/* ✅ Fix 1 — user_name en readOnly, non falsifiable */}
           <div className="add-task-field">
-            <label className="add-task-label">User Name *</label>
+            <label className="add-task-label">User Name</label>
             <input
               className="add-task-input"
               name="user_name"
               value={taskData.user_name}
-              onChange={handleChange}
+              readOnly
+              style={{ opacity: 0.6, cursor: "not-allowed" }}
             />
           </div>
 
@@ -138,6 +157,7 @@ export default function AddTaskPage() {
               name="languages"
               value={taskData.languages}
               onChange={handleChange}
+              placeholder="e.g. JavaScript, Python"
             />
           </div>
 
@@ -151,6 +171,7 @@ export default function AddTaskPage() {
             />
           </div>
 
+          {/* ✅ Fix 5 — placeholder pour guider le format groups */}
           <div className="add-task-field">
             <label className="add-task-label">Groups</label>
             <input
@@ -158,8 +179,10 @@ export default function AddTaskPage() {
               name="groups"
               value={taskData.groups}
               onChange={handleChange}
+              placeholder="e.g. public, premium"
             />
           </div>
+
           <div className="add-task-field">
             <label className="add-task-label">Credits *</label>
             <input
@@ -167,7 +190,7 @@ export default function AddTaskPage() {
               className="add-task-input"
               name="price"
               value={taskData.price === 0 ? "" : taskData.price}
-              placeholder="e.g 12"
+              placeholder="e.g. 12"
               onChange={handleChange}
             />
           </div>
@@ -222,7 +245,9 @@ export default function AddTaskPage() {
             </button>
 
             {success && (
-              <div className="add-task-success">Task added successfully!</div>
+              <div className="add-task-success">
+                Task added successfully! Redirecting...
+              </div>
             )}
           </div>
         </div>

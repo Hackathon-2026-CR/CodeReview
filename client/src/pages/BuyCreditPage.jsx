@@ -22,6 +22,7 @@ export default function BuyCreditsPage() {
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [fetchError, setFetchError] = useState(null); // ✅ Fix — erreur UI fetch
 
   useEffect(() => {
     const fetchCredits = async () => {
@@ -29,10 +30,17 @@ export default function BuyCreditsPage() {
       if (!username) return;
       try {
         const res = await api.get(`/api/tasks/users/${username}`);
+
+        // ✅ Fix — vérifier response.ok
+        if (!res.ok) {
+          setFetchError("Could not load your balance.");
+          return;
+        }
+
         const data = await res.json();
         if (data?.credits !== undefined) setCredits(data.credits);
       } catch {
-        console.error("Could not fetch credits");
+        setFetchError("Network error. Could not load your balance.");
       }
     };
     fetchCredits();
@@ -59,19 +67,22 @@ export default function BuyCreditsPage() {
         credits: newCredits,
       });
 
+      // ✅ Fix — vérifier response.ok
+      if (!res.ok) {
+        alert("Server error. Could not process purchase.");
+        return;
+      }
+
       const data = await res.json();
       if (data.error) {
         alert(data.error);
         return;
       }
 
-      const storedUser = JSON.parse(localStorage.getItem("auth_user") || "{}");
-      localStorage.setItem(
-        "auth_user",
-        JSON.stringify({ ...storedUser, credits: newCredits }),
-      );
-
+      // ✅ Fix — ne pas polluer auth_user avec credits
+      // auth_user contient { id, username }, on ne le modifie pas
       setCredits(newCredits);
+      setSelectedPack(null); // ✅ reset sélection après achat
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch {
@@ -97,7 +108,11 @@ export default function BuyCreditsPage() {
           </div>
           <div className="bc-balance">
             <span>Current balance</span>
-            <strong>{credits} credits</strong>
+            {/* ✅ Fix — afficher erreur si fetch échoue */}
+            <strong>{fetchError ? "—" : `${credits} credits`}</strong>
+            {fetchError && (
+              <p style={{ color: "red", fontSize: "0.75rem" }}>{fetchError}</p>
+            )}
           </div>
         </div>
 
@@ -151,8 +166,8 @@ export default function BuyCreditsPage() {
               <p>
                 You are purchasing{" "}
                 <strong>{selectedPack.credits} credits</strong> (
-                {selectedPack.label}) for <strong>${selectedPack.price}</strong>{" "}
-                via{" "}
+                {selectedPack.label}) for{" "}
+                <strong>${selectedPack.price}</strong> via{" "}
                 <strong>
                   {paymentMethods.find((m) => m.id === paymentMethod)?.label}
                 </strong>
@@ -171,7 +186,9 @@ export default function BuyCreditsPage() {
           </button>
 
           {success && (
-            <div className="bc-success">Credits added to your account</div>
+            <div className="bc-success">
+              ✅ {selectedPack === null ? "Credits" : ""} added to your account!
+            </div>
           )}
         </div>
       </div>

@@ -3,7 +3,7 @@ import { api } from "../api";
 import Navbar from "../components/Navbar";
 import "../styles/AccountInfosPage.css";
 
-const READ_ONLY_FIELDS = ["rating", "credits", "list_of_codes"];
+const READ_ONLY_FIELDS = ["rating", "credits", "name"];
 
 export default function AccountPage() {
   const [user, setUser] = useState(null);
@@ -41,7 +41,7 @@ export default function AccountPage() {
     setEditValue(
       Array.isArray(currentValue)
         ? currentValue.join(", ")
-        : (currentValue ?? ""),
+        : (currentValue ?? "")
     );
   };
 
@@ -59,6 +59,12 @@ export default function AccountPage() {
         name: localStorage.getItem("username"),
         [field]: newValue,
       });
+
+      // ✅ Fix 3 — vérifier response.ok avant de parser le JSON
+      if (!response.ok) {
+        alert("Server error. Could not save changes.");
+        return;
+      }
 
       const data = await response.json();
 
@@ -122,10 +128,6 @@ export default function AccountPage() {
                     ))
                   )}
                 </div>
-              ) : field === "password" ? (
-                <span className="account-value">
-                  {"•".repeat(value?.length || 8)}
-                </span>
               ) : field === "price" ? (
                 <span className="account-value">${value ?? "—"}</span>
               ) : field === "rating" ? (
@@ -171,13 +173,12 @@ export default function AccountPage() {
         <h1 className="account-title">Account Information</h1>
         <div className="account-card">
           {renderRow("Name", "name")}
-          {renderRow("Password", "password")}
+          {renderRow("Email", "email")}
           {renderRow("Credits", "credits")}
           {renderRow("Price", "price")}
           {renderRow("Rating", "rating")}
           {renderRow("Groups", "groups")}
           {renderRow("Code Languages", "languages")}
-          {renderRow("List of Codes", "list_of_codes")}
         </div>
       </div>
     </div>
