@@ -11,78 +11,21 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import AccountPage from "./pages/AccountInfosPage";
 import BuyCreditPage from "./pages/BuyCreditPage";
 
-
 function App() {
   return (
     <Routes>
-      {/* Public routes */}
+      {/* Public */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
 
-      {/* Protected routes */}
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <>
-              <HomePage />
-            </>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/all-tasks"
-        element={
-          <ProtectedRoute>
-            <>
-              <AllTasksPage />
-            </>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/my-tasks"
-        element={
-          <ProtectedRoute>
-            <>
-              <MyTasksPage />
-            </>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/add-task"
-        element={
-          <ProtectedRoute>
-            <>
-              <AddTaskPage />
-            </>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/task-details/:id"
-        element={
-          <ProtectedRoute>
-            <>
-              <TaskDetailsPage />
-            </>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/account"
-        element={
-          <ProtectedRoute>
-            <AccountPage />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* Catch-all */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-
-      <Route path="/buy-credits" element={<BuyCreditPage />} />
+      {/* Protected */}
+      <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+      <Route path="/all-tasks" element={<ProtectedRoute><AllTasksPage /></ProtectedRoute>} />
+      <Route path="/my-tasks" element={<ProtectedRoute><MyTasksPage /></ProtectedRoute>} />
+      <Route path="/add-task" element={<ProtectedRoute><AddTaskPage /></ProtectedRoute>} />
+      <Route path="/task-details/:id" element={<ProtectedRoute><TaskDetailsPage /></ProtectedRoute>} />
+      <Route path="/buy-credits" element={<ProtectedRoute><BuyCreditPage /></ProtectedRoute>} />
+      <Route path="/account" element={<ProtectedRoute><AccountPage /></ProtectedRoute>} />
 
       {/* Catch-all */}
       <Route path="*" element={<Navigate to="/" replace />} />

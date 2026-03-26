@@ -1,80 +1,66 @@
-/* ── Page ── */
-.all-tasks-container {
-  max-width: 800px;
-  margin: 2rem auto;
-  padding: 0 1rem;
-}
-
-.all-tasks-title {
-  font-size: 1.6rem;
-  font-weight: bold;
-  color: #a78bfa;
-  margin-bottom: 1.5rem;
-}
-
-/* ── List ── */
-.all-tasks-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.all-tasks-item-header {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
   gap: 1rem;
 }
 
-/* ── Task card ── */
-.all-tasks-item {
-  background-color: #1e1e2e;
-  border: 1px solid #a78bfa44;
-  border-radius: 14px;
-  padding: 1.2rem 1.5rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  transition: border 0.2s;
-}
-
-.all-tasks-item:hover {
-  border-color: #a78bfa;
-}
-
-.all-tasks-item h3 {
+.all-tasks-item-header h3 {
   color: #cdd6f4;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   margin: 0;
 }
 
-.all-tasks-item p {
+.all-tasks-price {
+  background: #a78bfa22;
+  border: 1px solid #a78bfa44;
+  color: #a78bfa;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.all-tasks-description {
   color: #888;
-  font-size: 0.9rem;
-  margin: 0;
+  font-size: 0.88rem;
+  margin: 0.4rem 0 0 0;
+  line-height: 1.5;
 }
 
-/* ── View button ── */
-.all-tasks-item button {
+.all-tasks-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+
+.all-tasks-badge {
+  background: #2a2a3e;
+  border: 1px solid #ffffff0d;
+  color: #888;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+}
+
+.all-tasks-btn {
   align-self: flex-end;
-  background-color: #a78bfa;
+  background: linear-gradient(135deg, #a78bfa, #7c3aed);
   border: none;
-  color: #1e1e2e;
-  padding: 8px 16px;
+  color: #fff;
+  padding: 8px 18px;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: bold;
-  transition: background 0.2s;
-  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  transition: all 0.2s;
+  margin-top: 0.8rem;
+  box-shadow: 0 2px 10px rgba(124, 58, 237, 0.3);
 }
 
-.all-tasks-item button:hover {
-  background-color: #c4b5fd;
-}
-
-/* ── Empty state ── */
-.all-tasks-empty {
-  color: #555;
-  font-size: 0.95rem;
-  font-style: italic;
-  text-align: center;
-  margin-top: 3rem;
+.all-tasks-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.45);
 }

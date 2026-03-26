@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { api } from "../api";
 import Navbar from "../components/Navbar";
 import "../styles/BuyCreditsPage.css";
 
@@ -21,22 +22,38 @@ export default function BuyCreditsPage() {
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [fetchError, setFetchError] = useState(null); // ✅ Fix — erreur UI fetch
 
-  // ── Load current credits ──
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("auth_user") || "{}");
-    if (user?.credits !== undefined) setCredits(user.credits);
+    const fetchCredits = async () => {
+      const username = localStorage.getItem("username");
+      if (!username) return;
+      try {
+        const res = await api.get(`/api/tasks/users/${username}`);
+
+        // ✅ Fix — vérifier response.ok
+        if (!res.ok) {
+          setFetchError("Could not load your balance.");
+          return;
+        }
+
+        const data = await res.json();
+        if (data?.credits !== undefined) setCredits(data.credits);
+      } catch {
+        setFetchError("Network error. Could not load your balance.");
+      }
+    };
+    fetchCredits();
   }, []);
 
-  // ── Purchase ──
   async function handlePurchase() {
     if (!selectedPack) {
       alert("Please select a credit pack first.");
       return;
     }
 
-    const user = JSON.parse(localStorage.getItem("auth_user") || "{}");
-    if (!user?.username) {
+    const username = localStorage.getItem("username");
+    if (!username) {
       alert("You are not logged in.");
       return;
     }
@@ -45,30 +62,27 @@ export default function BuyCreditsPage() {
     try {
       const newCredits = credits + selectedPack.credits;
 
-      const res = await fetch(
-        "https://nonpositivistic-unmesmerised-sharyn.ngrok-free.dev/api/tasks/update-user",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: user.username,
-            credits: newCredits,
-          }),
-        },
-      );
+      const res = await api.post("/api/tasks/update-user", {
+        name: username,
+        credits: newCredits,
+      });
+
+      // ✅ Fix — vérifier response.ok
+      if (!res.ok) {
+        alert("Server error. Could not process purchase.");
+        return;
+      }
 
       const data = await res.json();
-
       if (data.error) {
         alert(data.error);
         return;
       }
 
-      // Update localStorage
-      const updatedUser = { ...user, credits: newCredits };
-      localStorage.setItem("auth_user", JSON.stringify(updatedUser));
-
+      // ✅ Fix — ne pas polluer auth_user avec credits
+      // auth_user contient { id, username }, on ne le modifie pas
       setCredits(newCredits);
+      setSelectedPack(null); // ✅ reset sélection après achat
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch {
@@ -94,7 +108,11 @@ export default function BuyCreditsPage() {
           </div>
           <div className="bc-balance">
             <span>Current balance</span>
-            <strong>{credits} credits</strong>
+            {/* ✅ Fix — afficher erreur si fetch échoue */}
+            <strong>{fetchError ? "—" : `${credits} credits`}</strong>
+            {fetchError && (
+              <p style={{ color: "red", fontSize: "0.75rem" }}>{fetchError}</p>
+            )}
           </div>
         </div>
 
@@ -148,8 +166,8 @@ export default function BuyCreditsPage() {
               <p>
                 You are purchasing{" "}
                 <strong>{selectedPack.credits} credits</strong> (
-                {selectedPack.label}) for <strong>${selectedPack.price}</strong>{" "}
-                via{" "}
+                {selectedPack.label}) for{" "}
+                <strong>${selectedPack.price}</strong> via{" "}
                 <strong>
                   {paymentMethods.find((m) => m.id === paymentMethod)?.label}
                 </strong>
@@ -168,7 +186,9 @@ export default function BuyCreditsPage() {
           </button>
 
           {success && (
-            <div className="bc-success">Credits added to your account</div>
+            <div className="bc-success">
+              ✅ {selectedPack === null ? "Credits" : ""} added to your account!
+            </div>
           )}
         </div>
       </div>
