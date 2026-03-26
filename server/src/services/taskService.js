@@ -65,10 +65,18 @@ const takeTask = async (taskId, reviewerUsername) => {
   if (task.user_name === reviewerUsername)
     throw new Error("You cannot review your own task");
 
+  // ✅ On vérifie que le CRÉATEUR a assez de crédits pour payer
+  const creator = await userDal.findByName(task.user_name);
+  if (!creator) throw new Error("Creator not found");
+  if (creator.credits < task.price)
+    throw new Error(
+      "Creator does not have enough credits to pay for this review",
+    );
+
+  // ✅ Le reviewer n'a pas de condition de crédits — il va EN RECEVOIR
   const reviewer = await userDal.findByName(reviewerUsername);
   if (!reviewer) throw new Error("Reviewer not found");
 
-  // ✅ Pas de déduction ici — le reviewer prend juste la task
   await taskDal.updateTask(taskId, {
     reviewer: reviewerUsername,
     status: "review in process",
