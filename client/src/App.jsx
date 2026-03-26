@@ -1,4 +1,3 @@
-import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import AllTasksPage from "./pages/AllTasksPage";
@@ -7,6 +6,7 @@ import AddTaskPage from "./pages/AddTaskPage";
 import TaskDetailsPage from "./pages/TaskDetailsPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import LandingPage from "./pages/LandingPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AccountPage from "./pages/AccountInfosPage";
 import BuyCreditPage from "./pages/BuyCreditPage";
@@ -15,6 +15,7 @@ function App() {
   return (
     <Routes>
       {/* Public routes */}
+      <Route path="/landing" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
 
@@ -89,7 +90,7 @@ function App() {
       />
 
       {/* Catch-all */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<Navigate to="/landing" replace />} />
     </Routes>
   );
 }
