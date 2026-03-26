@@ -34,69 +34,6 @@ def published_codes(name):
 # published_codes('Jacob')
 
 # -------------------------------------------------------------------------------
-# actions on the db
-
-def assign_reviewer(id, reviewer):
-    """
-    Updates a code request to assign a reviewer and change its status to 'review in process'.
-    """
-    
-    if connection and cursor:
-        try:
-            update_query = """
-            UPDATE codes 
-            SET reviewer = %s, status = 'review in process'
-            WHERE id = %s
-            WHERE title = %s
-            """
-            
-            reviewer_name = reviewer['name']
-            
-            cursor.execute(update_query, (reviewer_name, id))
-            connection.commit()
-            
-            if cursor.rowcount > 0:
-                print(f"Success: code '{id}' is now being reviewed by {reviewer_name}.")
-            else:
-                print(f"Warning: No code found with the title '{id}'.")
-                
-        except mysql.connector.Error as err:
-            print(f"Database error: {err}")
-        
-active_reviewer = {
-        'name': 'Jacob',
-        'credits': 300,
-        'rating': 4.2
-    }
-    
-
-# assign_reviewer('SQL Window Functions', active_reviewer)    
-
-
-def finished_to_review(code_title):
-    try:
-        update_query = """
-        UPDATE codes 
-        SET status = 'reviewed'
-        WHERE title = %s
-        """
-        
-        
-        cursor.execute(update_query, (code_title))
-        
-        connection.commit()
-        
-        if cursor.rowcount > 0:
-            print(f"Success")
-        else:
-            print(f"Warning: No code found with the title '{code_title}'.")
-            
-    except mysql.connector.Error as err:
-        print(f"Database error: {err}")
-    
-
-# ---------------------------------------------------------------
-
 
 # querys:
 

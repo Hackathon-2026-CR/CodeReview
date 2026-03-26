@@ -117,32 +117,33 @@ def finished(reviwer_name):  # 4
 
 def get_available_by_user(username): # 5
     try:
-        user = """
-        SELECT groups FROM users
-        WHERE user = %s
+        user_query = """
+        SELECT `groups` FROM users
+        WHERE `name` = %s
         """
-        cursor.execute(user, [username])
-        groups = cursor.fetchone()
-
-        query = """
+        cursor.execute(user_query, (username,))
+        user_result = cursor.fetchone()
+        
+        if not user_result:
+            print(f"No user: {username}")
+            return []
+        
+        user_groups = json.loads(user_result[0] or '[]')
+        user_groups_json = json.dumps(user_groups)
+        
+        task_query = """
         SELECT t.* 
         FROM tasks t
-        JOIN users u ON u.name = %s
-        WHERE JSON_OVERLAPS(t.groups, u.`groups`) 
-           OR JSON_CONTAINS(t.groups, '"public"');
+        WHERE JSON_OVERLAPS(t.`groups`, %s)
+           OR JSON_CONTAINS(t.`groups`, '"public"')
         """
-        cursor.execute(query, groups)
+        cursor.execute(task_query, (user_groups_json,))
         answer = cursor.fetchall()
-        response = []
-        if answer:
-            for row in answer:
-                response.append(row)
-            cursor_to_dict(response)
         
-        else:
-            print(f"No codes found for reviewer: {username}")
-
-    except mysql.connector.Error as err:
+        response = cursor_to_dict(answer) if answer else []  # Fixed: pass list directly
+        return response
+        
+    except Exception as err:
         return f"Database error: {err}"
 
 
@@ -228,6 +229,7 @@ def update_user_profile(userupdate):
             params["price"] = userupdate.price
         if userupdate.languages is not None:
             updates.append("languages = %(languages)s")
+            params["languages"] = json.dumps(userupdate.languages)
         if userupdate.credits is not None:
             updates.append("credits = %(credits)s")
             params["credits"] = userupdate.credits
@@ -244,3 +246,48 @@ def update_user_profile(userupdate):
 
     except mysql.connector.Error as err:
         return {"error": str(err)}
+
+
+def assign_reviewer(reviewer):
+    task_id = reviewer.id
+    reviewer = reviewer.reviewer
+
+    if connection and cursor:
+        try:
+            update_query = """
+            UPDATE tasks 
+            SET reviewer = %s, status = 'review in process'
+            WHERE id = %s
+            """
+
+            cursor.execute(update_query, (reviewer, task_id))
+            connection.commit()
+
+            if cursor.rowcount > 0:
+                return f"Success: code '{task_id}' is now being reviewed by {reviewer}."
+            else:
+                return f"Warning: No code found with the title '{task_id}'."
+
+        except mysql.connector.Error as err:
+            print(f"Database error: {err}")
+
+
+def finished_to_review(id):
+    id = id.id
+    try:
+        update_query = """
+        UPDATE tasks 
+        SET status = 'reviewed'
+        WHERE id = %s
+        """
+
+        cursor.execute(update_query, (id,))
+
+        connection.commit()
+
+        if cursor.rowcount > 0:
+            return "Success"
+        return f"Warning: No code found with the id: {id}."
+
+    except mysql.connector.Error as err:
+        return f"Database error: {err}"
