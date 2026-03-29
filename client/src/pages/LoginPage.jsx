@@ -1,38 +1,34 @@
-import { useState, useEffect } from 'react'
-import { useAuth } from '../context/AuthContext'
-import { useNavigate, Link } from 'react-router-dom'
-import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
-import '../styles/LoginPage.css'
+import { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate, Link } from "react-router-dom";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import "../styles/LoginPage.css";
 
 export default function LoginPage() {
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
-  const { login, user } = useAuth()
-  const navigate = useNavigate()
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { login, user } = useAuth();
+  const navigate = useNavigate();
 
-  // Redirect if already logged in
   useEffect(() => {
-    if (user) {
-      navigate('/')
-    }
-  }, [user, navigate])
+    if (user) navigate("/");
+  }, [user, navigate]);
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
-
+    e.preventDefault();
+    setError("");
+    setLoading(true);
     try {
-      await login(username, password)
+      await login(username, password);
     } catch (err) {
-      setError(err.message || 'Login failed')
+      setError(err.message || "Login failed");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="login-container">
@@ -55,7 +51,7 @@ export default function LoginPage() {
             <label htmlFor="password">Password</label>
             <div className="password-input-wrapper">
               <input
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -67,9 +63,9 @@ export default function LoginPage() {
                 className="password-toggle"
                 onClick={() => setShowPassword(!showPassword)}
                 disabled={loading}
-                title={showPassword ? 'Hide password' : 'Show password'}
               >
-                {showPassword ? <AiOutlineEye /> : <AiOutlineEyeInvisible />}
+                {/* ✅ Fix — icônes dans le bon sens */}
+                {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
               </button>
             </div>
           </div>
@@ -77,14 +73,16 @@ export default function LoginPage() {
           {error && <div className="error-message">{error}</div>}
 
           <button type="submit" disabled={loading || !username || !password}>
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 
         <div className="auth-link">
-          <p>Don't have an account? <Link to="/register">Register here</Link></p>
+          <p>
+            Don't have an account? <Link to="/register">Register here</Link>
+          </p>
         </div>
       </div>
     </div>
-  )
+  );
 }

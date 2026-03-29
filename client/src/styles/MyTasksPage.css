@@ -1,0 +1,267 @@
+/* ── Page ── */
+.my-tasks-page {
+  max-width: 1100px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ── Global header ── */
+.my-tasks-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.my-tasks-header h2 {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #cdd6f4;
+  margin: 0;
+}
+
+.my-tasks-reload-btn {
+  background: transparent;
+  border: 1px solid #a78bfa44;
+  color: #a78bfa;
+  border-radius: 8px;
+  padding: 6px 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+}
+
+.my-tasks-reload-btn:hover {
+  background: #a78bfa22;
+  border-color: #a78bfa;
+}
+
+.my-tasks-reload-btn.spinning svg {
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── 3 colonnes ── */
+.my-tasks-columns {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.2rem;
+  align-items: start;
+}
+
+/* ── Section ── */
+.my-tasks-section {
+  background-color: #1e1e2e;
+  border-radius: 14px;
+  padding: 1.4rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.my-tasks-section h1 {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #a78bfa;
+  margin: 0;
+}
+
+/* ── Cards list ── */
+.my-tasks-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+/* ── Card ── */
+.my-tasks-card {
+  background-color: #2a2a3e;
+  border: 1px solid #a78bfa44;
+  border-radius: 10px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition:
+    border 0.2s,
+    background 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.my-tasks-card:hover {
+  border-color: #a78bfa;
+  background-color: #313145;
+}
+
+/* ── Card top ── */
+.my-tasks-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.my-tasks-card-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #cdd6f4;
+  line-height: 1.3;
+}
+
+/* ── Status badge ── */
+.my-tasks-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 20px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.badge-pending {
+  background: #a78bfa22;
+  color: #a78bfa;
+  border: 1px solid #a78bfa55;
+}
+.badge-review {
+  background: #fab38722;
+  color: #fab387;
+  border: 1px solid #fab38755;
+}
+.badge-reviewed {
+  background: #a6e3a122;
+  color: #a6e3a1;
+  border: 1px solid #a6e3a155;
+}
+
+/* ── Card meta ── */
+.my-tasks-card-meta {
+  font-size: 0.78rem;
+  color: #6c7086;
+  display: flex;
+  gap: 8px;
+}
+
+/* ── Card bottom ── */
+.my-tasks-card-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ── Delete button ── */
+.my-tasks-delete-btn {
+  background: transparent;
+  border: 1.5px solid #f38ba8;
+  color: #f38ba8;
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.my-tasks-delete-btn:hover {
+  background: #f38ba8;
+  color: #1e1e2e;
+}
+
+/* ── Empty state ── */
+.my-tasks-empty {
+  color: #555;
+  font-size: 0.85rem;
+  font-style: italic;
+  list-style: none;
+}
+
+/* ── Add Task button ── */
+.add-task {
+  display: flex;
+  justify-content: center;
+}
+
+.add-task button {
+  background-color: #a78bfa;
+  border: none;
+  color: #1e1e2e;
+  padding: 11px 28px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+.add-task button:hover {
+  background-color: #c4b5fd;
+}
+
+/* ── Skeleton ── */
+.my-tasks-skeleton {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #1a1a2e;
+  pointer-events: none;
+}
+
+.skeleton-bar {
+  background: linear-gradient(90deg, #2a2a3e 25%, #3a3a4e 50%, #2a2a3e 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 6px;
+  height: 13px;
+}
+
+.skeleton-title {
+  width: 60%;
+}
+.skeleton-status {
+  width: 20%;
+  margin-left: auto;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .my-tasks-columns {
+    grid-template-columns: 1fr;
+  }
+}

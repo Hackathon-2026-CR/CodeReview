@@ -1,20 +1,23 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { api } from "../api";
 import "../styles/AddTaskPage.css";
 import Navbar from "../components/Navbar";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function AddTaskPage() {
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
   const [mode, setMode] = useState("file");
   const [fileKey, setFileKey] = useState(0);
+  const navigate = useNavigate();
 
   const [taskData, setTaskData] = useState({
     title: "",
     user_name: localStorage.getItem("username") || "",
+    price: 0,
     languages: "",
     description: "",
-    groups: "",
-    price: 0,
+    groups: "public",
     code: "",
     file: null,
   });
@@ -36,7 +39,7 @@ export default function AddTaskPage() {
       user_name: localStorage.getItem("username") || "",
       languages: "",
       description: "",
-      groups: "",
+      groups: "public",
       price: 0,
       code: "",
       file: null,
@@ -53,15 +56,27 @@ export default function AddTaskPage() {
       (mode === "manual" && !taskData.code) ||
       (mode === "file" && !taskData.file)
     ) {
-      alert(
-        "Please fill all required fields: Title, User Name, Languages, Price" +
-          (mode === "manual" ? ", Code" : ", File"),
+      toast.error(
+        `Please fill all required fields: Title, Languages, Price${mode === "manual" ? ", Code" : ", File"}`,
       );
       return;
     }
 
+    if (
+      mode === "file" &&
+      taskData.file &&
+      taskData.file.size > 5 * 1024 * 1024
+    ) {
+      toast.error("File too large. Maximum size is 5MB.");
+      return;
+    }
+
+    if (taskData.price <= 0) {
+      toast.error("Price must be greater than 0.");
+      return;
+    }
+
     setLoading(true);
-    setSuccess(false);
 
     try {
       const formData = new FormData();
@@ -78,29 +93,26 @@ export default function AddTaskPage() {
         formData.append("code", taskData.code);
       }
 
-      const response = await fetch("http://localhost:8000/api/tasks/add-task-with-file", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await api.postForm("/api/tasks/add-task", formData);
 
       if (response.status === 400) {
-        alert("Invalid data. Please check your inputs.");
+        toast.error("Invalid data. Please check your inputs.");
         return;
       }
       if (response.status === 401) {
-        alert("You are not logged in.");
+        toast.error("You are not logged in.");
         return;
       }
       if (!response.ok) {
-        alert("Something went wrong. Please try again.");
+        toast.error("Something went wrong. Please try again.");
         return;
       }
 
       resetForm();
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 2000);
-    } catch (err) {
-      alert("Network error. Check your internet connection.");
+      toast.success("Task added successfully! Redirecting...");
+      setTimeout(() => navigate("/my-tasks"), 1500);
+    } catch {
+      toast.error("Network error. Check your internet connection.");
     } finally {
       setLoading(false);
     }
@@ -108,6 +120,7 @@ export default function AddTaskPage() {
 
   return (
     <div>
+      <Toaster position="top-right" />
       <Navbar />
       <div className="add-task-container">
         <h1 className="add-task-title">Add New Task</h1>
@@ -124,12 +137,13 @@ export default function AddTaskPage() {
           </div>
 
           <div className="add-task-field">
-            <label className="add-task-label">User Name *</label>
+            <label className="add-task-label">User Name</label>
             <input
               className="add-task-input"
               name="user_name"
               value={taskData.user_name}
-              onChange={handleChange}
+              readOnly
+              style={{ opacity: 0.6, cursor: "not-allowed" }}
             />
           </div>
 
@@ -140,6 +154,7 @@ export default function AddTaskPage() {
               name="languages"
               value={taskData.languages}
               onChange={handleChange}
+              placeholder="e.g. JavaScript, Python"
             />
           </div>
 
@@ -160,16 +175,18 @@ export default function AddTaskPage() {
               name="groups"
               value={taskData.groups}
               onChange={handleChange}
+              placeholder="e.g. public, premium"
             />
           </div>
 
           <div className="add-task-field">
-            <label className="add-task-label">Price *</label>
+            <label className="add-task-label">Credits *</label>
             <input
               type="number"
               className="add-task-input"
               name="price"
-              value={taskData.price}
+              value={taskData.price === 0 ? "" : taskData.price}
+              placeholder="e.g. 12"
               onChange={handleChange}
             />
           </div>
@@ -222,10 +239,6 @@ export default function AddTaskPage() {
             >
               {loading ? "Adding..." : "Add Task"}
             </button>
-
-            {success && (
-              <div className="add-task-success">Task added successfully!</div>
-            )}
           </div>
         </div>
       </div>

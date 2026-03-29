@@ -1,0 +1,316 @@
+.bc-page {
+  max-width: 920px;
+  margin: 2.5rem auto;
+  padding: 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+/* ── Header ── */
+.bc-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.bc-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #cdd6f4;
+  margin: 0 0 0.4rem 0;
+  letter-spacing: -0.5px;
+}
+
+.bc-title span {
+  color: #a78bfa;
+}
+
+.bc-subtitle {
+  color: #555;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.bc-balance {
+  background: #1e1e2e;
+  border: 1px solid #a78bfa22;
+  border-radius: 14px;
+  padding: 14px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+.bc-balance span {
+  color: #555;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.bc-balance strong {
+  color: #a78bfa;
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+/* ── Section label ── */
+.bc-section-label {
+  font-size: 0.72rem;
+  color: #555;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin: 0 0 1.2rem 0;
+}
+
+/* ── Grid ── */
+.bc-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.2rem;
+}
+
+@media (max-width: 680px) {
+  .bc-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ── Pack card ── */
+.bc-card {
+  position: relative;
+  background: #1e1e2e;
+  border: 1px solid #ffffff08;
+  border-radius: 18px;
+  padding: 2.5rem 1.5rem 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  overflow: hidden;
+}
+
+.bc-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, #a78bfa0a, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+.bc-card:hover {
+  border-color: #a78bfa44;
+  transform: translateY(-5px);
+  box-shadow: 0 16px 40px rgba(167, 139, 250, 0.1);
+}
+
+.bc-card:hover::after {
+  opacity: 1;
+}
+
+.bc-card.selected {
+  border-color: #a78bfa;
+  background: linear-gradient(160deg, #22153a, #1e1e2e);
+  box-shadow:
+    0 0 0 3px #a78bfa22,
+    0 16px 40px rgba(167, 139, 250, 0.15);
+}
+
+.bc-card.selected::after {
+  opacity: 1;
+}
+
+/* ── Popular ── */
+.bc-popular {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: linear-gradient(135deg, #a78bfa, #7c3aed);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 5px 14px;
+  border-radius: 0 18px 0 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.bc-card-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #555;
+  margin: 0;
+}
+
+.bc-card-credits {
+  font-size: 3rem;
+  font-weight: 900;
+  color: #cdd6f4;
+  margin: 0.4rem 0 0 0;
+  line-height: 1;
+  letter-spacing: -2px;
+}
+
+.bc-card-credits-sub {
+  font-size: 0.78rem;
+  color: #444;
+  margin: 0 0 0.6rem 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.bc-divider {
+  width: 40px;
+  height: 1px;
+  background: #a78bfa22;
+  margin: 0.6rem 0;
+}
+
+.bc-card-price {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #a78bfa;
+  margin: 0;
+}
+
+.bc-card-rate {
+  font-size: 0.72rem;
+  color: #444;
+  margin: 0;
+}
+
+/* ── Payment ── */
+.bc-payment-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.bc-payment-card {
+  flex: 1;
+  min-width: 130px;
+  background: #1e1e2e;
+  border: 1px solid #ffffff08;
+  border-radius: 12px;
+  padding: 1.1rem 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  cursor: pointer;
+  color: #555;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.bc-payment-card:hover {
+  border-color: #a78bfa44;
+  color: #cdd6f4;
+}
+
+.bc-payment-card.selected {
+  border-color: #a78bfa;
+  color: #cdd6f4;
+  background: linear-gradient(135deg, #22153a, #1e1e2e);
+  box-shadow: 0 0 0 3px #a78bfa22;
+}
+
+.bc-payment-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid #333;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.bc-payment-dot.active {
+  border-color: #a78bfa;
+  background: #a78bfa;
+  box-shadow: 0 0 8px #a78bfa88;
+}
+
+/* ── Summary ── */
+.bc-summary {
+  background: #1e1e2e;
+  border: 1px solid #a78bfa22;
+  border-radius: 18px;
+  padding: 2rem 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.bc-summary-text p {
+  color: #888;
+  font-size: 0.95rem;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.bc-summary-text strong {
+  color: #cdd6f4;
+  font-weight: 600;
+}
+
+.bc-hint {
+  color: #444 !important;
+  font-style: italic;
+}
+
+/* ── Button ── */
+.bc-btn {
+  background: linear-gradient(135deg, #a78bfa, #7c3aed);
+  border: none;
+  color: #fff;
+  padding: 13px 36px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+  transition: all 0.2s;
+  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.4);
+}
+
+.bc-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(124, 58, 237, 0.5);
+}
+
+.bc-btn:active {
+  transform: translateY(0);
+}
+
+.bc-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+@keyframes bcFadeOut {
+  0% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}

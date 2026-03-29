@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import "../styles/Navbar.css"
+import "../styles/Navbar.css";
 
 const pages = [
   { name: "Home", path: "/" },
   { name: "All Tasks", path: "/all-tasks" },
   { name: "My Tasks", path: "/my-tasks" },
   { name: "Add Task", path: "/add-task" },
+  { name: "Buy Credits", path: "/buy-credits" },
 ];
 
 export default function Navbar() {
@@ -15,13 +16,15 @@ export default function Navbar() {
   const location = useLocation();
   const { logout } = useAuth();
 
+  const username = localStorage.getItem("username");
+
   const handleLogout = () => {
     logout();
   };
 
   return (
     <nav className="navbar">
-      <div className="navbar-logo">MyApp</div>
+      <div className="navbar-logo">Review4u</div>
 
       <ul className="navbar-list">
         {pages.map((page) => (
@@ -41,7 +44,7 @@ export default function Navbar() {
           className="navbar-account-btn"
           onClick={() => setDropdownOpen((prev) => !prev)}
         >
-          My Account
+          {username || "My Account"}
         </button>
 
         {dropdownOpen && (
