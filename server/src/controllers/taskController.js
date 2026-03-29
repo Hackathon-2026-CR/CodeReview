@@ -64,17 +64,17 @@ const addTask = async (req, res) => {
 // ✅ Nouveau
 const takeTask = async (req, res) => {
   try {
-    const result = await taskService.takeTask(
-      req.params.id,
-      req.body.reviewer
-    );
+    const result = await taskService.takeTask(req.params.id, req.body.reviewer);
     res.json(result);
   } catch (err) {
     const status =
-      err.message === "Task not found" ? 404
-      : err.message === "Not enough credits" ? 402
-      : err.message === "Unauthorized" ? 403
-      : 400;
+      err.message === "Task not found"
+        ? 404
+        : err.message === "Not enough credits"
+          ? 402
+          : err.message === "Unauthorized"
+            ? 403
+            : 400;
     res.status(status).json({ error: err.message });
   }
 };
@@ -85,44 +85,72 @@ const submitReview = async (req, res) => {
     const result = await taskService.submitReview(
       req.params.id,
       req.body.reviewer,
-      req.body.review_content
+      req.body.review_content,
     );
     res.json(result);
   } catch (err) {
     const status =
-      err.message === "Task not found" ? 404
-      : err.message === "Unauthorized" || err.message === "You are not the reviewer of this task" ? 403
-      : 400;
+      err.message === "Task not found"
+        ? 404
+        : err.message === "Unauthorized" ||
+            err.message === "You are not the reviewer of this task"
+          ? 403
+          : 400;
     res.status(status).json({ error: err.message });
   }
 };
 const cancelTask = async (req, res) => {
   try {
-    const result = await taskService.cancelTask(req.params.id, req.body.reviewer);
+    const result = await taskService.cancelTask(
+      req.params.id,
+      req.body.reviewer,
+    );
     res.json(result);
   } catch (err) {
     const status =
-      err.message === "Task not found" ? 404
-      : err.message === "You are not the reviewer of this task" ? 403
-      : 400;
+      err.message === "Task not found"
+        ? 404
+        : err.message === "You are not the reviewer of this task"
+          ? 403
+          : 400;
     res.status(status).json({ error: err.message });
   }
 };
-
 
 const rateReview = async (req, res) => {
   try {
     const result = await taskService.rateReview(
       req.params.id,
       req.body.creator,
-      req.body.rating
+      req.body.rating,
     );
     res.json(result);
   } catch (err) {
     const status =
-      err.message === "Task not found" ? 404
-      : err.message === "Only the task creator can rate the review" ? 403
-      : 400;
+      err.message === "Task not found"
+        ? 404
+        : err.message === "Only the task creator can rate the review"
+          ? 403
+          : 400;
+    res.status(status).json({ error: err.message });
+  }
+};
+
+const deleteTask = async (req, res) => {
+  try {
+    // ✅ req.query au lieu de req.body
+    const result = await taskService.removeTask(
+      req.params.id,
+      req.query.username,
+    );
+    res.json(result);
+  } catch (err) {
+    const status =
+      err.message === "Task not found"
+        ? 404
+        : err.message === "You can only delete your own tasks"
+          ? 403
+          : 400;
     res.status(status).json({ error: err.message });
   }
 };
@@ -135,8 +163,8 @@ module.exports = {
   getTaskById,
   addTask,
   takeTask,
-  cancelTask,   
-  submitReview, 
-  rateReview,   
+  cancelTask,
+  submitReview,
+  rateReview,
+  deleteTask,
 };
-

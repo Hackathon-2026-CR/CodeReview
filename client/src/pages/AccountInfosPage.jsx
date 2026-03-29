@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { api } from "../api";
 import Navbar from "../components/Navbar";
 import "../styles/AccountInfosPage.css";
+import toast, { Toaster } from "react-hot-toast";
 
 const READ_ONLY_FIELDS = ["rating", "credits", "name"];
 
@@ -11,29 +12,29 @@ export default function AccountPage() {
   const [editingField, setEditingField] = useState(null);
   const [editValue, setEditValue] = useState("");
 
-  useEffect(() => {
+  const fetchUser = async () => {
     const username = localStorage.getItem("username");
-
     if (!username) {
       setError("You are not logged in. Please log in first.");
       return;
     }
-
-    const fetchUser = async () => {
-      try {
-        const response = await api.get(`/api/tasks/users/${username}`);
-        if (!response.ok) {
-          setError("Something went wrong. Please try again later.");
-          return;
-        }
-        const data = await response.json();
-        setUser(data);
-      } catch {
-        setError("Network error. Check your internet connection.");
+    try {
+      const response = await api.get(`/api/users/${username}`);
+      if (!response.ok) {
+        setError("Something went wrong. Please try again later.");
+        return;
       }
-    };
+      const data = await response.json();
+      setUser(data);
+    } catch {
+      setError("Network error. Check your internet connection.");
+    }
+  };
 
+  useEffect(() => {
     fetchUser();
+    window.addEventListener("focus", fetchUser);
+    return () => window.removeEventListener("focus", fetchUser);
   }, []);
 
   const handleEdit = (field, currentValue) => {
@@ -55,28 +56,27 @@ export default function AccountPage() {
       : editValue;
 
     try {
-      const response = await api.post("/api/tasks/update-user", {
+      const response = await api.post("/api/users/update-user", {
         name: localStorage.getItem("username"),
         [field]: newValue,
       });
 
-      // ✅ Fix 3 — vérifier response.ok avant de parser le JSON
       if (!response.ok) {
-        alert("Server error. Could not save changes.");
+        toast.error("Server error. Could not save changes.");
         return;
       }
 
       const data = await response.json();
-
       if (data.error) {
-        alert(data.error);
+        toast.error(data.error);
         return;
       }
 
       setUser((prev) => ({ ...prev, [field]: newValue }));
       setEditingField(null);
+      toast.success("Field updated successfully!");
     } catch {
-      alert("Network error. Could not save changes.");
+      toast.error("Network error. Could not save changes.");
     }
   };
 
@@ -128,8 +128,6 @@ export default function AccountPage() {
                     ))
                   )}
                 </div>
-              ) : field === "price" ? (
-                <span className="account-value">${value ?? "—"}</span>
               ) : field === "rating" ? (
                 <span className="account-value">{value ?? "—"} / 5</span>
               ) : (
@@ -168,6 +166,7 @@ export default function AccountPage() {
 
   return (
     <div>
+      <Toaster position="top-right" />
       <Navbar />
       <div className="account-container">
         <h1 className="account-title">Account Information</h1>
@@ -175,7 +174,6 @@ export default function AccountPage() {
           {renderRow("Name", "name")}
           {renderRow("Email", "email")}
           {renderRow("Credits", "credits")}
-          {renderRow("Price", "price")}
           {renderRow("Rating", "rating")}
           {renderRow("Groups", "groups")}
           {renderRow("Code Languages", "languages")}

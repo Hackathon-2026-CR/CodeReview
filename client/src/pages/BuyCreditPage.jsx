@@ -2,12 +2,13 @@ import { useState, useEffect } from "react";
 import { api } from "../api";
 import Navbar from "../components/Navbar";
 import "../styles/BuyCreditsPage.css";
+import toast, { Toaster } from "react-hot-toast";
 
 const packs = [
-  { id: 1, credits: 50, price: 5, label: "Starter" },
-  { id: 2, credits: 120, price: 10, label: "Basic" },
-  { id: 3, credits: 300, price: 20, label: "Pro", popular: true },
-  { id: 4, credits: 1000, price: 50, label: "Elite" },
+  { id: "starter", credits: 50, price: 5, label: "Starter" },
+  { id: "basic", credits: 120, price: 10, label: "Basic" },
+  { id: "pro", credits: 300, price: 20, label: "Pro", popular: true },
+  { id: "elite", credits: 1000, price: 50, label: "Elite" },
 ];
 
 const paymentMethods = [
@@ -21,22 +22,18 @@ export default function BuyCreditsPage() {
   const [selectedPack, setSelectedPack] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [fetchError, setFetchError] = useState(null); // ✅ Fix — erreur UI fetch
+  const [fetchError, setFetchError] = useState(null);
 
   useEffect(() => {
     const fetchCredits = async () => {
       const username = localStorage.getItem("username");
       if (!username) return;
       try {
-        const res = await api.get(`/api/tasks/users/${username}`);
-
-        // ✅ Fix — vérifier response.ok
+        const res = await api.get(`/api/users/${username}`);
         if (!res.ok) {
           setFetchError("Could not load your balance.");
           return;
         }
-
         const data = await res.json();
         if (data?.credits !== undefined) setCredits(data.credits);
       } catch {
@@ -48,45 +45,56 @@ export default function BuyCreditsPage() {
 
   async function handlePurchase() {
     if (!selectedPack) {
-      alert("Please select a credit pack first.");
+      toast.error("Please select a credit pack first.");
       return;
     }
-
     const username = localStorage.getItem("username");
     if (!username) {
-      alert("You are not logged in.");
+      toast.error("You are not logged in.");
       return;
     }
 
     setLoading(true);
     try {
-      const newCredits = credits + selectedPack.credits;
+      if (paymentMethod === "card") {
+        const res = await api.post("/api/payments/create-checkout", {
+          username,
+          package: selectedPack.id,
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          toast.error(data.error || "Server error.");
+          return;
+        }
+        if (data.url) {
+          window.location.href = data.url;
+          return;
+        }
+        toast.error("Stripe session creation failed.");
+        return;
+      }
 
-      const res = await api.post("/api/tasks/update-user", {
+      // PayPal / Crypto — simulation
+      const newCredits = credits + selectedPack.credits;
+      const res = await api.post("/api/users/update-user", {
         name: username,
         credits: newCredits,
       });
-
-      // ✅ Fix — vérifier response.ok
       if (!res.ok) {
-        alert("Server error. Could not process purchase.");
+        toast.error("Server error. Could not process purchase.");
         return;
       }
-
       const data = await res.json();
       if (data.error) {
-        alert(data.error);
+        toast.error(data.error);
         return;
       }
 
-      // ✅ Fix — ne pas polluer auth_user avec credits
-      // auth_user contient { id, username }, on ne le modifie pas
       setCredits(newCredits);
-      setSelectedPack(null); // ✅ reset sélection après achat
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
+      setSelectedPack(null);
+      toast.success("Credits added to your account!");
     } catch {
-      alert("Network error. Please try again.");
+      toast.error("Network error. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -94,6 +102,7 @@ export default function BuyCreditsPage() {
 
   return (
     <div>
+      <Toaster position="top-right" />
       <Navbar />
       <div className="bc-page">
         {/* ── Header ── */}
@@ -108,7 +117,6 @@ export default function BuyCreditsPage() {
           </div>
           <div className="bc-balance">
             <span>Current balance</span>
-            {/* ✅ Fix — afficher erreur si fetch échoue */}
             <strong>{fetchError ? "—" : `${credits} credits`}</strong>
             {fetchError && (
               <p style={{ color: "red", fontSize: "0.75rem" }}>{fetchError}</p>
@@ -140,7 +148,7 @@ export default function BuyCreditsPage() {
           </div>
         </section>
 
-        {/* ── Payment ── */}
+        {/* ── Payment Method ── */}
         <section>
           <p className="bc-section-label">Payment Method</p>
           <div className="bc-payment-row">
@@ -166,11 +174,13 @@ export default function BuyCreditsPage() {
               <p>
                 You are purchasing{" "}
                 <strong>{selectedPack.credits} credits</strong> (
-                {selectedPack.label}) for{" "}
-                <strong>${selectedPack.price}</strong> via{" "}
+                {selectedPack.label}) for <strong>${selectedPack.price}</strong>{" "}
+                via{" "}
                 <strong>
                   {paymentMethods.find((m) => m.id === paymentMethod)?.label}
                 </strong>
+                {paymentMethod === "card" &&
+                  " — you will be redirected to Stripe"}
               </p>
             ) : (
               <p className="bc-hint">Select a pack above to continue</p>
@@ -182,14 +192,12 @@ export default function BuyCreditsPage() {
             onClick={handlePurchase}
             disabled={loading || !selectedPack}
           >
-            {loading ? "Processing..." : "Confirm Purchase"}
+            {loading
+              ? paymentMethod === "card"
+                ? "Redirecting..."
+                : "Processing..."
+              : "Confirm Purchase"}
           </button>
-
-          {success && (
-            <div className="bc-success">
-              ✅ {selectedPack === null ? "Credits" : ""} added to your account!
-            </div>
-          )}
         </div>
       </div>
     </div>

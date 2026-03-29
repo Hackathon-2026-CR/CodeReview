@@ -1,8 +1,27 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import CodeMirror from "@uiw/react-codemirror";
+import { oneDark } from "@codemirror/theme-one-dark";
+import { javascript } from "@codemirror/lang-javascript";
+import { python } from "@codemirror/lang-python";
+import { java } from "@codemirror/lang-java";
+import { cpp } from "@codemirror/lang-cpp";
+import { css } from "@codemirror/lang-css";
+import { html } from "@codemirror/lang-html";
 import { api } from "../api";
 import Navbar from "../components/Navbar";
 import "../styles/TaskDetailsPage.css";
+import toast, { Toaster } from "react-hot-toast";
+
+const getLanguageExtension = (languages = []) => {
+  const lang = languages[0]?.toLowerCase() || "";
+  if (lang.includes("python")) return [python()];
+  if (lang.includes("java") && !lang.includes("script")) return [java()];
+  if (lang.includes("c++") || lang.includes("cpp")) return [cpp()];
+  if (lang.includes("css")) return [css()];
+  if (lang.includes("html")) return [html()];
+  return [javascript()];
+};
 
 export default function TaskDetailsPage() {
   const { id } = useParams();
@@ -15,7 +34,6 @@ export default function TaskDetailsPage() {
   const [rating, setRating] = useState(5);
   const [reviewContent, setReviewContent] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
-  const [success, setSuccess] = useState(null);
 
   useEffect(() => {
     const fetchTask = async () => {
@@ -45,7 +63,7 @@ export default function TaskDetailsPage() {
       });
       if (!res.ok) {
         const data = await res.json();
-        alert(data.error || "Could not take task.");
+        toast.error(data.error || "Could not take task.");
         return;
       }
       setTask((prev) => ({
@@ -53,9 +71,9 @@ export default function TaskDetailsPage() {
         status: "review in process",
         reviewer: username,
       }));
-      setSuccess("Task taken! You can now review the code.");
+      toast.success("Task taken! You can now review the code.");
     } catch {
-      alert("Network error.");
+      toast.error("Network error.");
     } finally {
       setActionLoading(false);
     }
@@ -70,7 +88,7 @@ export default function TaskDetailsPage() {
       });
       if (!res.ok) {
         const data = await res.json();
-        alert(data.error || "Could not cancel task.");
+        toast.error(data.error || "Could not cancel task.");
         return;
       }
       setTask((prev) => ({
@@ -79,10 +97,9 @@ export default function TaskDetailsPage() {
         reviewer: null,
         review_content: null,
       }));
-      // ✅ Fix — plus de mention remboursement
-      setSuccess("Task cancelled successfully.");
+      toast.success("Task cancelled successfully.");
     } catch {
-      alert("Network error.");
+      toast.error("Network error.");
     } finally {
       setActionLoading(false);
     }
@@ -90,7 +107,7 @@ export default function TaskDetailsPage() {
 
   const handleSubmitReview = async () => {
     if (!reviewContent.trim()) {
-      alert("Please write your review before submitting.");
+      toast.error("Please write your review before submitting.");
       return;
     }
     setActionLoading(true);
@@ -101,7 +118,7 @@ export default function TaskDetailsPage() {
       });
       if (!res.ok) {
         const data = await res.json();
-        alert(data.error || "Could not submit review.");
+        toast.error(data.error || "Could not submit review.");
         return;
       }
       setTask((prev) => ({
@@ -109,11 +126,9 @@ export default function TaskDetailsPage() {
         status: "reviewed",
         review_content: reviewContent,
       }));
-      setSuccess(
-        "Review submitted! Credits have been transferred to your account.",
-      );
+      toast.success("Review submitted! Credits have been transferred.");
     } catch {
-      alert("Network error.");
+      toast.error("Network error.");
     } finally {
       setActionLoading(false);
     }
@@ -122,7 +137,7 @@ export default function TaskDetailsPage() {
   const handleRateReview = async () => {
     const parsedRating = parseInt(rating);
     if (isNaN(parsedRating) || parsedRating < 1 || parsedRating > 5) {
-      alert("Rating must be a number between 1 and 5.");
+      toast.error("Rating must be between 1 and 5.");
       return;
     }
     setActionLoading(true);
@@ -133,25 +148,34 @@ export default function TaskDetailsPage() {
       });
       if (!res.ok) {
         const data = await res.json();
-        alert(data.error || "Could not rate review.");
+        toast.error(data.error || "Could not rate review.");
         return;
       }
       setTask((prev) => ({ ...prev, rating: parsedRating }));
-      setSuccess("Review rated successfully!");
+      toast.success("Review rated successfully!");
     } catch {
-      alert("Network error.");
+      toast.error("Network error.");
     } finally {
       setActionLoading(false);
     }
   };
 
+  // ── Skeleton ──
   if (loading)
     return (
       <div>
         <Navbar />
-        <p className="td-empty">Loading...</p>
+        <div className="td-container">
+          <div className="td-skeleton">
+            <div className="skeleton-bar td-sk-title" />
+            <div className="skeleton-bar td-sk-meta" />
+            <div className="skeleton-bar td-sk-desc" />
+            <div className="skeleton-bar td-sk-code" />
+          </div>
+        </div>
       </div>
     );
+
   if (error)
     return (
       <div>
@@ -159,14 +183,17 @@ export default function TaskDetailsPage() {
         <p className="td-empty">{error}</p>
       </div>
     );
+
   if (!task) return null;
 
   const isCreator = username === task.user_name;
   const isReviewer = username === task.reviewer;
   const isVisitor = !isCreator && !isReviewer;
+  const langExtensions = getLanguageExtension(task.languages);
 
   return (
     <div>
+      <Toaster position="top-right" />
       <Navbar />
       <div className="td-container">
         {/* ── Header ── */}
@@ -196,36 +223,42 @@ export default function TaskDetailsPage() {
           <p className="td-description">{task.description}</p>
         )}
 
-        {/* ── Code (créateur + reviewer uniquement) ── */}
+        {/* ── Code ── */}
         {(isCreator || isReviewer) && task.code && (
           <div className="td-code-block">
             <h2>Code to review</h2>
-            <pre>
-              <code>{task.code}</code>
-            </pre>
+            <CodeMirror
+              value={task.code}
+              theme={oneDark}
+              extensions={langExtensions}
+              editable={false}
+              basicSetup={{ lineNumbers: true, foldGutter: true }}
+            />
           </div>
         )}
 
-        {/* ── Contenu review (créateur après reviewed) ── */}
+        {/* ── Review finale ── */}
         {isCreator && task.status === "reviewed" && task.review_content && (
           <div className="td-code-block">
             <h2>Review from {task.reviewer}</h2>
-            <pre>
-              <code>{task.review_content}</code>
-            </pre>
+            <CodeMirror
+              value={task.review_content}
+              theme={oneDark}
+              extensions={langExtensions}
+              editable={false}
+              basicSetup={{ lineNumbers: true, foldGutter: true }}
+            />
           </div>
         )}
 
-        {/* ── Rating final ── */}
-        {task.rating !== null && !isNaN(task.rating) && (
+        {/* ── Rating affiché ── */}
+        {task.rating != null && (
           <div className="td-rating">
-            ⭐ Rating given : <strong>{task.rating} / 5</strong>
+            ⭐ Rating : <strong>{task.rating} / 5</strong>
           </div>
         )}
 
-        {success && <p className="td-success">{success}</p>}
-
-        {/* ── VISITEUR — prendre la task ── */}
+        {/* ── VISITEUR ── */}
         {isVisitor && task.status === "pending" && (
           <button
             className="td-btn"
@@ -238,18 +271,21 @@ export default function TaskDetailsPage() {
           </button>
         )}
 
-        {/* ── REVIEWER — soumettre review + annuler ── */}
+        {/* ── REVIEWER ── */}
         {isReviewer && task.status === "review in process" && (
           <div className="td-review-form">
             <h2>Submit your review</h2>
-            <label>Your review</label>
-            <textarea
-              className="td-review-textarea"
-              placeholder="Write your code review here..."
-              value={reviewContent}
-              onChange={(e) => setReviewContent(e.target.value)}
-              rows={6}
-            />
+            <div className="td-editor-wrapper">
+              <CodeMirror
+                value={reviewContent}
+                height="300px"
+                theme={oneDark}
+                extensions={langExtensions}
+                onChange={(value) => setReviewContent(value)}
+                placeholder="Write your code review here..."
+                basicSetup={{ lineNumbers: true, foldGutter: true }}
+              />
+            </div>
             <div className="td-review-actions">
               <button
                 className="td-btn"
@@ -258,7 +294,6 @@ export default function TaskDetailsPage() {
               >
                 {actionLoading ? "Submitting..." : "Submit Review"}
               </button>
-              {/* ✅ Fix — "Cancel Task" sans mention remboursement */}
               <button
                 className="td-cancel-btn"
                 onClick={handleCancelTask}
@@ -270,7 +305,7 @@ export default function TaskDetailsPage() {
           </div>
         )}
 
-        {/* ── CRÉATEUR — statut + noter la review ── */}
+        {/* ── CRÉATEUR ── */}
         {isCreator && (
           <>
             <p className="td-info">
@@ -278,14 +313,14 @@ export default function TaskDetailsPage() {
               {task.status === "review in process" &&
                 `🔍 Being reviewed by ${task.reviewer}`}
               {task.status === "reviewed" &&
-                task.rating === null &&
+                task.rating == null &&
                 "✅ Review received! Please rate it below."}
               {task.status === "reviewed" &&
-                task.rating !== null &&
+                task.rating != null &&
                 "✅ All done!"}
             </p>
 
-            {task.status === "reviewed" && task.rating === null && (
+            {task.status === "reviewed" && task.rating == null && (
               <div className="td-review-form">
                 <h2>Rate this review</h2>
                 <label>

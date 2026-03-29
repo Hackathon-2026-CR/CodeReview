@@ -9,8 +9,9 @@ const userSchema = new mongoose.Schema(
     groups: { type: [String], default: [] },
     price: { type: Number, default: null },
     languages: { type: [String], default: [] },
+    rating: { type: Number, default: null },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 module.exports = mongoose.model("User", userSchema);

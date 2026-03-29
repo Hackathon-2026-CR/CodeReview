@@ -19,9 +19,13 @@ const findById = (id) => Task.findById(id);
 
 const createTask = (taskData) => Task.create(taskData);
 
-// ✅ Nouveau
 const updateTask = (id, updates) =>
   Task.findByIdAndUpdate(id, updates, { new: true });
+
+const deleteTask = (id) => Task.findByIdAndDelete(id);
+
+const findRatedTasksByReviewer = (reviewer) =>
+  Task.find({ reviewer, rating: { $ne: null } });
 
 module.exports = {
   findByUserName,
@@ -31,4 +35,6 @@ module.exports = {
   findById,
   createTask,
   updateTask,
+  deleteTask,
+  findRatedTasksByReviewer, // ✅
 };

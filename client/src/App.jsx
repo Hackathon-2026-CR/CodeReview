@@ -10,6 +10,8 @@ import RegisterPage from "./pages/RegisterPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AccountPage from "./pages/AccountInfosPage";
 import BuyCreditPage from "./pages/BuyCreditPage";
+import PaymentSuccessPage from "./pages/PaymentSuccessPage";
+import PaymentCancelPage from "./pages/PaymentCancelPage";
 
 function App() {
   return (
@@ -25,6 +27,8 @@ function App() {
       <Route path="/add-task" element={<ProtectedRoute><AddTaskPage /></ProtectedRoute>} />
       <Route path="/task-details/:id" element={<ProtectedRoute><TaskDetailsPage /></ProtectedRoute>} />
       <Route path="/buy-credits" element={<ProtectedRoute><BuyCreditPage /></ProtectedRoute>} />
+      <Route path="/payment-success" element={<ProtectedRoute><PaymentSuccessPage /></ProtectedRoute>} />
+      <Route path="/payment-cancel" element={<ProtectedRoute><PaymentCancelPage /></ProtectedRoute>} />
       <Route path="/account" element={<ProtectedRoute><AccountPage /></ProtectedRoute>} />
 
       {/* Catch-all */}

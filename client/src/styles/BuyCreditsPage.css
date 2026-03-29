@@ -303,20 +303,6 @@
   box-shadow: none;
 }
 
-/* ── Success ── */
-.bc-success {
-  width: 100%;
-  background: #a6e3a112;
-  border: 1px solid #a6e3a144;
-  color: #a6e3a1;
-  padding: 10px 20px;
-  border-radius: 10px;
-  font-size: 0.88rem;
-  font-weight: 500;
-  text-align: center;
-  animation: bcFadeOut 3s forwards;
-}
-
 @keyframes bcFadeOut {
   0% {
     opacity: 1;

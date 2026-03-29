@@ -2,8 +2,10 @@ const taskDal = require("../dal/taskDal");
 const userDal = require("../dal/userDal");
 
 const getMyTasks = (username) => taskDal.findByUserName(username);
+
 const getWorkingTasks = (reviewerName) =>
   taskDal.findWorkingByReviewer(reviewerName);
+
 const getFinishedTasks = (reviewerName) =>
   taskDal.findFinishedByReviewer(reviewerName);
 
@@ -40,6 +42,11 @@ const addTask = async ({
           .filter(Boolean)
       : groups || ["public"];
 
+  const creator = await userDal.findByName(user_name);
+  if (!creator) throw new Error("User not found");
+  if (creator.credits < parseInt(price))
+    throw new Error("Not enough credits to create this task");
+
   const task = await taskDal.createTask({
     title,
     user_name,
@@ -57,7 +64,6 @@ const addTask = async ({
   };
 };
 
-// ── Prendre une task (aucun transfert de crédits ici) ──
 const takeTask = async (taskId, reviewerUsername) => {
   const task = await taskDal.findById(taskId);
   if (!task) throw new Error("Task not found");
@@ -65,15 +71,13 @@ const takeTask = async (taskId, reviewerUsername) => {
   if (task.user_name === reviewerUsername)
     throw new Error("You cannot review your own task");
 
-  // ✅ On vérifie que le CRÉATEUR a assez de crédits pour payer
   const creator = await userDal.findByName(task.user_name);
   if (!creator) throw new Error("Creator not found");
   if (creator.credits < task.price)
     throw new Error(
-      "Creator does not have enough credits to pay for this review",
+      "This task cannot be taken — creator has insufficient credits",
     );
 
-  // ✅ Le reviewer n'a pas de condition de crédits — il va EN RECEVOIR
   const reviewer = await userDal.findByName(reviewerUsername);
   if (!reviewer) throw new Error("Reviewer not found");
 
@@ -85,16 +89,14 @@ const takeTask = async (taskId, reviewerUsername) => {
   return { status: "success", message: "Task taken successfully" };
 };
 
-// ── Annuler (aucun remboursement car rien n'a été prélevé) ──
 const cancelTask = async (taskId, reviewerUsername) => {
   const task = await taskDal.findById(taskId);
   if (!task) throw new Error("Task not found");
   if (task.status !== "review in process")
     throw new Error("Task is not in review");
-  if (task.reviewer !== reviewerUsername)
+  if (task.reviewer?.toString().trim() !== reviewerUsername?.toString().trim())
     throw new Error("You are not the reviewer of this task");
 
-  // ✅ Juste remettre la task en pending, pas de remboursement
   await taskDal.updateTask(taskId, {
     reviewer: null,
     status: "pending",
@@ -104,27 +106,25 @@ const cancelTask = async (taskId, reviewerUsername) => {
   return { status: "success", message: "Task cancelled successfully" };
 };
 
-// ── Soumettre la review → reviewer reçoit les crédits ──
 const submitReview = async (taskId, reviewerUsername, reviewContent) => {
   const task = await taskDal.findById(taskId);
   if (!task) throw new Error("Task not found");
   if (task.status !== "review in process")
     throw new Error("Task is not in review");
-  if (task.reviewer !== reviewerUsername)
+  if (task.reviewer?.toString().trim() !== reviewerUsername?.toString().trim())
     throw new Error("You are not the reviewer of this task");
   if (!reviewContent || reviewContent.trim() === "")
     throw new Error("Review content is required");
 
-  // ✅ Déduit les crédits du créateur
   const creator = await userDal.findByName(task.user_name);
   if (!creator) throw new Error("Creator not found");
   if (creator.credits < task.price)
     throw new Error("Creator does not have enough credits");
+
   await userDal.updateByName(task.user_name, {
     credits: creator.credits - task.price,
   });
 
-  // ✅ Crédite le reviewer
   const reviewer = await userDal.findByName(reviewerUsername);
   if (reviewer) {
     await userDal.updateByName(reviewerUsername, {
@@ -143,7 +143,6 @@ const submitReview = async (taskId, reviewerUsername, reviewContent) => {
   };
 };
 
-// ── Noter la review (créateur) — aucun transfert ici ──
 const rateReview = async (taskId, creatorUsername, rating) => {
   const task = await taskDal.findById(taskId);
   if (!task) throw new Error("Task not found");
@@ -155,10 +154,29 @@ const rateReview = async (taskId, creatorUsername, rating) => {
   if (!rating || rating < 1 || rating > 5)
     throw new Error("Rating must be between 1 and 5");
 
-  // ✅ Juste la note, plus de transfert de crédits
   await taskDal.updateTask(taskId, { rating });
 
+  const ratedTasks = await taskDal.findRatedTasksByReviewer(task.reviewer);
+  const allRatings = [...ratedTasks.map((t) => t.rating), rating];
+  const avg = allRatings.reduce((sum, r) => sum + r, 0) / allRatings.length;
+  const roundedAvg = Math.round(avg * 10) / 10;
+
+  await userDal.updateByName(task.reviewer, { rating: roundedAvg });
+
   return { status: "success", message: "Review rated successfully" };
+};
+
+// ✅ removeTask était manquant
+const removeTask = async (taskId, username) => {
+  const task = await taskDal.findById(taskId);
+  if (!task) throw new Error("Task not found");
+  if (task.user_name !== username)
+    throw new Error("You can only delete your own tasks");
+  if (task.status !== "pending")
+    throw new Error("Cannot delete a task that is already in review");
+
+  await taskDal.deleteTask(taskId);
+  return { status: "success", message: "Task deleted successfully" };
 };
 
 module.exports = {
@@ -172,4 +190,5 @@ module.exports = {
   cancelTask,
   submitReview,
   rateReview,
+  removeTask, // ✅
 };

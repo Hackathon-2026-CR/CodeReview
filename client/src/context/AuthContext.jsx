@@ -9,7 +9,6 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Restore session from localStorage on mount
   useEffect(() => {
     const savedUser = localStorage.getItem("auth_user");
     if (savedUser) {
@@ -18,17 +17,20 @@ export function AuthProvider({ children }) {
       } catch {
         localStorage.removeItem("auth_user");
         localStorage.removeItem("username");
+        localStorage.removeItem("token");
       }
     }
     setLoading(false);
   }, []);
 
   const login = async (username, password) => {
-    const response = await api.post("/api/tasks/login", { username, password });
+    const response = await api.post("/api/users/login", { username, password });
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error || errorData.detail?.error || "Invalid credentials");
+      throw new Error(
+        errorData.error || errorData.detail?.error || "Invalid credentials",
+      );
     }
 
     const data = await response.json();
@@ -36,11 +38,12 @@ export function AuthProvider({ children }) {
     setUser(data.user);
     localStorage.setItem("auth_user", JSON.stringify(data.user));
     localStorage.setItem("username", data.user.username);
+    // ✅ token optionnel — stocke seulement s'il existe
+    if (data.token) localStorage.setItem("token", data.token);
     navigate("/");
   };
-
   const register = async (name, password, email) => {
-    const response = await api.post("/api/tasks/add-user", {
+    const response = await api.post("/api/users/add-user", {
       name,
       password,
       email,
@@ -51,7 +54,7 @@ export function AuthProvider({ children }) {
       throw new Error(errorData.error || "Registration failed");
     }
 
-    // After register, auto-login
+    // ✅ Auto-login après register
     await login(name, password);
   };
 
@@ -59,6 +62,7 @@ export function AuthProvider({ children }) {
     setUser(null);
     localStorage.removeItem("auth_user");
     localStorage.removeItem("username");
+    localStorage.removeItem("token");
     navigate("/login");
   };
 

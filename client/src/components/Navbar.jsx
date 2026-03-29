@@ -16,13 +16,15 @@ export default function Navbar() {
   const location = useLocation();
   const { logout } = useAuth();
 
+  const username = localStorage.getItem("username");
+
   const handleLogout = () => {
     logout();
   };
 
   return (
     <nav className="navbar">
-      <div className="navbar-logo">ReviewLY</div>
+      <div className="navbar-logo">Review4u</div>
 
       <ul className="navbar-list">
         {pages.map((page) => (
@@ -42,7 +44,7 @@ export default function Navbar() {
           className="navbar-account-btn"
           onClick={() => setDropdownOpen((prev) => !prev)}
         >
-          My Account
+          {username || "My Account"}
         </button>
 
         {dropdownOpen && (

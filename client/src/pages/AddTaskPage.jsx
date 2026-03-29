@@ -3,17 +3,16 @@ import { useNavigate } from "react-router-dom";
 import { api } from "../api";
 import "../styles/AddTaskPage.css";
 import Navbar from "../components/Navbar";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function AddTaskPage() {
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
   const [mode, setMode] = useState("file");
   const [fileKey, setFileKey] = useState(0);
   const navigate = useNavigate();
 
   const [taskData, setTaskData] = useState({
     title: "",
-    // ✅ Fix 1 — user_name pré-rempli depuis localStorage, non modifiable
     user_name: localStorage.getItem("username") || "",
     price: 0,
     languages: "",
@@ -57,31 +56,27 @@ export default function AddTaskPage() {
       (mode === "manual" && !taskData.code) ||
       (mode === "file" && !taskData.file)
     ) {
-      alert(
-        "Please fill all required fields: Title, Languages, Price" +
-          (mode === "manual" ? ", Code" : ", File"),
+      toast.error(
+        `Please fill all required fields: Title, Languages, Price${mode === "manual" ? ", Code" : ", File"}`,
       );
       return;
     }
 
-    // ✅ Fix 2 — validation taille fichier (max 5MB)
     if (
       mode === "file" &&
       taskData.file &&
       taskData.file.size > 5 * 1024 * 1024
     ) {
-      alert("File too large. Maximum size is 5MB.");
+      toast.error("File too large. Maximum size is 5MB.");
       return;
     }
 
-    // ✅ Fix 3 — price doit être > 0
     if (taskData.price <= 0) {
-      alert("Price must be greater than 0.");
+      toast.error("Price must be greater than 0.");
       return;
     }
 
     setLoading(true);
-    setSuccess(false);
 
     try {
       const formData = new FormData();
@@ -101,25 +96,23 @@ export default function AddTaskPage() {
       const response = await api.postForm("/api/tasks/add-task", formData);
 
       if (response.status === 400) {
-        alert("Invalid data. Please check your inputs.");
+        toast.error("Invalid data. Please check your inputs.");
         return;
       }
       if (response.status === 401) {
-        alert("You are not logged in.");
+        toast.error("You are not logged in.");
         return;
       }
       if (!response.ok) {
-        alert("Something went wrong. Please try again.");
+        toast.error("Something went wrong. Please try again.");
         return;
       }
 
       resetForm();
-      setSuccess(true);
-
-      // ✅ Fix 4 — redirection vers /my-tasks après succès
+      toast.success("Task added successfully! Redirecting...");
       setTimeout(() => navigate("/my-tasks"), 1500);
-    } catch (err) {
-      alert("Network error. Check your internet connection.");
+    } catch {
+      toast.error("Network error. Check your internet connection.");
     } finally {
       setLoading(false);
     }
@@ -127,6 +120,7 @@ export default function AddTaskPage() {
 
   return (
     <div>
+      <Toaster position="top-right" />
       <Navbar />
       <div className="add-task-container">
         <h1 className="add-task-title">Add New Task</h1>
@@ -142,7 +136,6 @@ export default function AddTaskPage() {
             />
           </div>
 
-          {/* ✅ Fix 1 — user_name en readOnly, non falsifiable */}
           <div className="add-task-field">
             <label className="add-task-label">User Name</label>
             <input
@@ -175,7 +168,6 @@ export default function AddTaskPage() {
             />
           </div>
 
-          {/* ✅ Fix 5 — placeholder pour guider le format groups */}
           <div className="add-task-field">
             <label className="add-task-label">Groups</label>
             <input
@@ -247,12 +239,6 @@ export default function AddTaskPage() {
             >
               {loading ? "Adding..." : "Add Task"}
             </button>
-
-            {success && (
-              <div className="add-task-success">
-                Task added successfully! Redirecting...
-              </div>
-            )}
           </div>
         </div>
       </div>

@@ -1,0 +1,343 @@
+/* ── Landing Page Layout ── */
+.landing-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #11111b 0%, #1e1e2e 100%);
+  color: #cdd6f4;
+}
+
+/* ── Header/Navbar ── */
+.landing-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(30, 30, 46, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(167, 139, 250, 0.2);
+  padding: 1rem 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.landing-header-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.landing-logo h1 {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #a78bfa;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.landing-auth-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.landing-btn {
+  padding: 0.6rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.landing-btn-login {
+  background: transparent;
+  color: #a78bfa;
+  border: 1.5px solid #a78bfa;
+}
+
+.landing-btn-login:hover {
+  background: rgba(167, 139, 250, 0.1);
+  border-color: #c4b5fd;
+  color: #c4b5fd;
+}
+
+.landing-btn-register {
+  background: linear-gradient(135deg, #a78bfa, #c4b5fd);
+  color: #11111b;
+}
+
+.landing-btn-register:hover {
+  background: linear-gradient(135deg, #c4b5fd, #d4bbff);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(167, 139, 250, 0.3);
+}
+
+/* ── Main Content ── */
+.landing-main {
+  flex: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  width: 100%;
+}
+
+/* ── Hero Section ── */
+.landing-hero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 500px;
+  padding: 3rem 0;
+  text-align: center;
+}
+
+.hero-content {
+  animation: fadeInDown 0.8s ease-out;
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: bold;
+  color: #a78bfa;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.hero-subtitle {
+  font-size: 1.3rem;
+  color: #cdd6f4;
+  opacity: 0.9;
+  margin-bottom: 2rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.landing-btn-primary {
+  background: linear-gradient(135deg, #a78bfa, #c4b5fd);
+  color: #11111b;
+  padding: 0.8rem 2rem;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.landing-btn-primary:hover {
+  background: linear-gradient(135deg, #c4b5fd, #d4bbff);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 24px rgba(167, 139, 250, 0.35);
+}
+
+.landing-btn-secondary {
+  background: rgba(167, 139, 250, 0.1);
+  color: #a78bfa;
+  border: 2px solid #a78bfa;
+  padding: 0.6rem 2rem;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.landing-btn-secondary:hover {
+  background: rgba(167, 139, 250, 0.2);
+  border-color: #c4b5fd;
+  color: #c4b5fd;
+}
+
+/* ── Features Section ── */
+.landing-features {
+  padding: 4rem 0;
+  border-top: 1px solid rgba(167, 139, 250, 0.1);
+  border-bottom: 1px solid rgba(167, 139, 250, 0.1);
+}
+
+.landing-features h3 {
+  font-size: 2.5rem;
+  color: #a78bfa;
+  text-align: center;
+  margin-bottom: 3rem;
+  font-weight: bold;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 2rem;
+}
+
+.feature-item {
+  text-align: center;
+  padding: 2rem 1.5rem;
+  border-radius: 12px;
+  background: rgba(167, 139, 250, 0.05);
+  border: 1px solid rgba(167, 139, 250, 0.1);
+  transition: all 0.3s ease;
+}
+
+.feature-item:hover {
+  background: rgba(167, 139, 250, 0.1);
+  border-color: rgba(167, 139, 250, 0.3);
+  transform: translateY(-6px);
+  box-shadow: 0 12px 24px rgba(167, 139, 250, 0.15);
+}
+
+.feature-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #a78bfa, #c4b5fd);
+  color: #11111b;
+  border-radius: 50%;
+  font-weight: bold;
+  font-size: 1.8rem;
+  margin: 0 auto 1rem;
+}
+
+.feature-item h4 {
+  font-size: 1.3rem;
+  color: #a78bfa;
+  margin: 0.5rem 0;
+  font-weight: 600;
+}
+
+.feature-item p {
+  color: #cdd6f4;
+  font-size: 0.95rem;
+  margin: 0;
+  opacity: 0.85;
+}
+
+/* ── CTA Section ── */
+.landing-cta {
+  padding: 4rem 2rem;
+  text-align: center;
+  background: linear-gradient(
+    135deg,
+    rgba(167, 139, 250, 0.1),
+    rgba(139, 92, 246, 0.05)
+  );
+  border-radius: 16px;
+  margin: 3rem 0;
+  border: 1px solid rgba(167, 139, 250, 0.2);
+}
+
+.cta-content h3 {
+  font-size: 2rem;
+  color: #a78bfa;
+  margin: 0 0 1rem 0;
+}
+
+.cta-content p {
+  font-size: 1.1rem;
+  color: #cdd6f4;
+  opacity: 0.9;
+  margin: 0 0 2rem 0;
+}
+
+.landing-btn-primary-large {
+  background: linear-gradient(135deg, #a78bfa, #c4b5fd);
+  color: #11111b;
+  padding: 1rem 2.5rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.landing-btn-primary-large:hover {
+  background: linear-gradient(135deg, #c4b5fd, #d4bbff);
+  transform: translateY(-3px);
+  box-shadow: 0 14px 28px rgba(167, 139, 250, 0.4);
+}
+
+/* ── Footer ── */
+.landing-footer {
+  background: rgba(17, 17, 27, 0.8);
+  border-top: 1px solid rgba(167, 139, 250, 0.1);
+  padding: 2rem 1rem;
+  text-align: center;
+  color: #888;
+  font-size: 0.9rem;
+  margin-top: auto;
+}
+
+.landing-footer p {
+  margin: 0;
+}
+
+/* ── Animations ── */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.2rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1.1rem;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .landing-btn-primary,
+  .landing-btn-secondary {
+    width: 100%;
+  }
+
+  .landing-header-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .landing-auth-buttons {
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .landing-btn-login,
+  .landing-btn-register {
+    flex: 1;
+  }
+
+  .landing-features h3 {
+    font-size: 2rem;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .landing-cta {
+    margin: 2rem 0;
+    padding: 2rem 1rem;
+  }
+
+  .cta-content h3 {
+    font-size: 1.6rem;
+  }
+
+  .landing-logo h1 {
+    font-size: 1.5rem;
+  }
+}
